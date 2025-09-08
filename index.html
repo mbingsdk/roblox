@@ -6,7 +6,7 @@
   <title>Redirecting...</title>
 
   <!-- Open Graph tags (biar preview Discord/WA tetap Roblox) -->
-  <meta property="og:title" content="Roblox Profile" />
+  <meta property="og:title" content="Roblox Penguin Antarctica" />
   <meta property="og:description" content="Lihat profil Roblox saya di sini!" />
   <meta property="og:url" content="https://www.roblox.com/users/8737968881/profile" />
   <meta property="og:image" content="https://tr.rbxcdn.com/30DAY-AvatarHeadshot-Png/150/150/AvatarHeadshot/Png/noFilter" />
@@ -18,6 +18,15 @@
   <meta name="twitter:image" content="https://tr.rbxcdn.com/30DAY-AvatarHeadshot-Png/150/150/AvatarHeadshot/Png/noFilter" />
 </head>
 <body>
+  <script>
+    // Coba buka app Roblox
+    window.location.href = "roblox://user?userid=8737968881";
+
+    // Kalau gagal (misalnya user di PC/browser), fallback ke web profile
+    setTimeout(function() {
+      window.location.href = "https://www.roblox.com/users/8737968881/profile";
+    }, 1000);
+  </script>
   <p>Redirecting to Roblox profile...</p>
 </body>
 </html>
