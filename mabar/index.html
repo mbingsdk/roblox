@@ -4,15 +4,97 @@
   <meta charset="UTF-8" />
   <title>MABAR WITH PENGUIN ANTARCTICA</title>
 
-  <!-- Statis, biar preview jalan -->
+  <!-- Static OG tags untuk preview -->
   <meta property="og:title" content="Room Mabar Roblox" />
   <meta property="og:description" content="Join room mabar sekarang!" />
   <meta property="og:url" content="https://www.roblox.com/games/1234567890/Room-Mabar" />
-  <meta property="og:image" content="https://tr.rbxcdn.com/room-thumbnail.png" />
+  <meta property="og:image" content="https://tr.rbxcdn.com/30DAY-AvatarHeadshot-C54A0819BB9D35EB33371DCDD2CAFBA1-Png/150/150/AvatarHeadshot/Webp/noFilter" />
 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="twitter:card" content="summary_large_image" />
+
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: linear-gradient(135deg, #1e1f29, #2d2f45);
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+    p {
+      opacity: 0.8;
+    }
+    /* Alert box */
+    .alert {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #ff4757;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(255, 71, 87, 0.7);
+      color: white;
+      font-weight: bold;
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: all 0.3s ease-in-out;
+      z-index: 9999;
+    }
+    .alert.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .alert.success {
+      background: #2ed573;
+      box-shadow: 0 0 15px rgba(46, 213, 115, 0.7);
+    }
+  </style>
 </head>
 <body>
+  <h1>🎮 Redirecting to Roblox Room...</h1>
+  <p>Harap tunggu, sedang cek status player.</p>
+
+  <div id="alertBox" class="alert"></div>
+
+  <script>
+    function showAlert(message, type = "error") {
+      const alertBox = document.getElementById("alertBox");
+      alertBox.textContent = message;
+      alertBox.className = "alert " + (type === "success" ? "success" : "");
+      alertBox.classList.add("show");
+
+      // auto hide after 5s
+      setTimeout(() => {
+        alertBox.classList.remove("show");
+      }, 5000);
+    }
+
+    fetch("https://discord.mbingsdk.my.id/api/roblox/current-room")
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === "ingame") {
+          showAlert("✅ Player ditemukan! Redirecting...", "success");
+          setTimeout(() => {
+            window.location.replace(data.joinLink);
+          }, 2000);
+        } else {
+          showAlert("⚠️ Player lagi offline / tidak in-game.");
+        }
+      })
+      .catch(err => {
+        showAlert("❌ Error ambil data dari server.");
+      });
+  </script>
 
   <!-- script>
     const apiUrl = "https://api.github.com/repos/mbingsdk/roblox/contents/mabar/config.json";
@@ -27,22 +109,6 @@
         window.location.replace(roomUrl);
       });
 </script -->
-
-  <script>
-    fetch("https://discord.mbingsdk.my.id/api/roblox/current-room")
-      .then(res => res.json())
-      .then(data => {
-        if (data.status === "ingame") {
-          window.location.replace(data.joinLink);
-        } else {
-          window.alert("Player lagi offline / tidak in-game.");
-        }
-      })
-      .catch(err => {
-        window.alert("Error ambil data");
-      });
-  </script>
-
-  <p>Redirecting to Roblox Room...</p>
 </body>
 </html>
+
