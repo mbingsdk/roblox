@@ -13,7 +13,8 @@
   <meta name="twitter:card" content="summary_large_image" />
 </head>
 <body>
-  <script>
+
+  <!-- script>
     const apiUrl = "https://api.github.com/repos/mbingsdk/roblox/contents/mabar/config.json";
 
     fetch(apiUrl)
@@ -25,7 +26,23 @@
         // redirect
         window.location.replace(roomUrl);
       });
+</script -->
+
+  <script>
+    fetch("https://discord.mbingsdk.my.id/api/roblox/current-room")
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === "ingame") {
+          window.location.replace(data.joinLink);
+        } else {
+          window.alert("Player lagi offline / tidak in-game.");
+        }
+      })
+      .catch(err => {
+        window.alert("Error ambil data");
+      });
   </script>
+
   <p>Redirecting to Roblox Room...</p>
 </body>
 </html>
