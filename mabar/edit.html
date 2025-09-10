@@ -3,25 +3,96 @@
 <head>
   <meta charset="UTF-8">
   <title>Mabar With Penguin</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+      color: #fff;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+    #mabarLink {
+      display: inline-block;
+      background: #fff;
+      color: #0077ff;
+      padding: 12px 25px;
+      border-radius: 30px;
+      font-weight: bold;
+      text-decoration: none;
+      transition: 0.3s;
+    }
+    #mabarLink:hover {
+      background: #0077ff;
+      color: #fff;
+    }
+    hr {
+      margin: 40px auto;
+      border: 0;
+      height: 1px;
+      width: 60%;
+      background: rgba(255,255,255,0.4);
+    }
+    h2 {
+      margin-bottom: 15px;
+    }
+    input {
+      padding: 10px;
+      width: 300px;
+      max-width: 80%;
+      border: none;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background: #ffcc00;
+      color: #333;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #ffaa00;
+    }
+    footer {
+      margin-top: 50px;
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+  </style>
 </head>
 <body>
-  <h1>Room Mabar Roblox</h1>
-  <p><a id="mabarLink" href="#" target="_blank">Join Room</a></p>
+  <h1>🎮 Room Mabar Roblox</h1>
+  <p><a id="mabarLink" href="#" target="_blank">Join Room 🚀</a></p>
 
   <hr>
   <h2>Edit Link Mabar</h2>
   <input type="text" id="newLink" placeholder="Masukkan link baru">
-  <button onclick="updateLink()">Save</button>
+  <br>
+  <button onclick="updateLink()">💾 Save</button>
+
+  <footer>Made with ❤️ by Penguin</footer>
 
   <script>
-    const owner = "mbingsdk";         // ganti dengan username GitHub kamu
-    const repo = "roblox";         // ganti dengan nama repo Pages
-    const branch = "main";            // atau "master"
-    const filePath = "mabar/config.json";   // file tempat simpan link
+    const owner = "mbingsdk";         
+    const repo = "roblox";         
+    const branch = "main";            
+    const filePath = "mabar/config.json";  
 
     const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
 
-    let token = localStorage.getItem("gh_token") || ""; // token pribadi
+    let token = localStorage.getItem("gh_token") || ""; 
 
     // Ambil link saat load
     fetch(apiUrl)
@@ -46,9 +117,7 @@
       });
       const fileData = await res.json();
 
-      const newContent = {
-        roomUrl: newUrl
-      };
+      const newContent = { roomUrl: newUrl };
 
       // Push update ke GitHub
       await fetch(apiUrl, {
