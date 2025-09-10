@@ -17,9 +17,9 @@
     const owner = "mbingsdk";         // ganti dengan username GitHub kamu
     const repo = "roblox";         // ganti dengan nama repo Pages
     const branch = "main";            // atau "master"
-    const filePath = "config.json";   // file tempat simpan link
+    const filePath = "mabar/config.json";   // file tempat simpan link
 
-    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/mabar/${filePath}`;
+    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
 
     let token = localStorage.getItem("gh_token") || ""; // token pribadi
 
