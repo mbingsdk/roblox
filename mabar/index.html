@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mabar With Penguin</title>
+</head>
+<body>
+  <h1>Room Mabar Roblox</h1>
+  <p><a id="mabarLink" href="#" target="_blank">Join Room</a></p>
+
+  <hr>
+  <h2>Edit Link Mabar</h2>
+  <input type="text" id="newLink" placeholder="Masukkan link baru">
+  <button onclick="updateLink()">Save</button>
+
+  <script>
+    const owner = "mbingsdk";         // ganti dengan username GitHub kamu
+    const repo = "roblox";         // ganti dengan nama repo Pages
+    const branch = "main";            // atau "master"
+    const filePath = "config.json";   // file tempat simpan link
+
+    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
+
+    let token = localStorage.getItem("gh_token") || ""; // token pribadi
+
+    // Ambil link saat load
+    fetch(apiUrl)
+      .then(res => res.json())
+      .then(data => {
+        const content = JSON.parse(atob(data.content));
+        document.getElementById("mabarLink").href = content.roomUrl;
+      });
+
+    async function updateLink() {
+      const newUrl = document.getElementById("newLink").value.trim();
+      if (!newUrl) return alert("Isi link dulu!");
+
+      if (!token) {
+        token = prompt("Masukkan GitHub Token kamu:");
+        if (token) localStorage.setItem("gh_token", token);
+      }
+
+      // Ambil file SHA dulu
+      const res = await fetch(apiUrl, {
+        headers: { Authorization: `token ${token}` }
+      });
+      const fileData = await res.json();
+
+      const newContent = {
+        roomUrl: newUrl
+      };
+
+      // Push update ke GitHub
+      await fetch(apiUrl, {
+        method: "PUT",
+        headers: {
+          "Authorization": `token ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: "Update room link",
+          content: btoa(JSON.stringify(newContent, null, 2)),
+          sha: fileData.sha,
+          branch
+        })
+      });
+
+      alert("✅ Link berhasil diupdate!");
+      document.getElementById("mabarLink").href = newUrl;
+    }
+  </script>
+</body>
+</html>
