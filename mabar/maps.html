@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Overlay Map</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      background: #0d0d0f;
+      color: white;
+      font-family: Arial, sans-serif;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .overlay {
+      background: rgba(0,0,0,0.7);
+      padding: 20px 40px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(0, 242, 254, 0.8);
+    }
+
+    .map-name {
+      font-size: 1.5rem;
+      margin-bottom: 15px;
+      color: #00f2fe;
+    }
+
+    button {
+      background: linear-gradient(90deg, #4facfe, #00f2fe);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px #00f2fe;
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay">
+    <div class="map-name" id="mapName">Loading...</div>
+    <button onclick="fetchMap()">🔄 Refresh</button>
+  </div>
+
+  <script>
+    async function fetchMap() {
+      try {
+        // ganti URL API kamu di sini 👇
+        const res = await axios.get("https://discord.mbingsdk.my.id/api/roblox/current-room");
+        const mapName = res.data?.lastLocation || "Unknown Map"; 
+        document.getElementById("mapName").innerText = mapName;
+      } catch (err) {
+        document.getElementById("mapName").innerText = "Error loading map";
+        console.error(err);
+      }
+    }
+
+    // load pertama kali
+    fetchMap();
+  </script>
+</body>
+</html>
