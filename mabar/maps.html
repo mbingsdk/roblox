@@ -11,14 +11,12 @@
       background: transparent; /* biar nggak nutup stream */
       font-family: 'Courier New', monospace;
       color: white;
-      height: 100vh;
-      display: flex;
-      justify-content: flex-end; /* rata kanan */
-      align-items: flex-start; /* atas */
-      padding: 20px;
     }
 
     .overlay {
+      position: fixed;
+      top: 20px;
+      right: 20px; /* pojok kanan atas */
       padding: 10px 20px;
       border-radius: 12px;
     }
@@ -76,7 +74,7 @@
       try {
         const res = await axios.get("https://discord.mbingsdk.my.id/api/roblox/current-room");
         const mapName = res.data?.lastLocation || "Unknown Map";
-        animateText(mapName);
+        animateText("MAP: "+mapName);
       } catch (err) {
         animateText("Error loading map");
         console.error(err);
