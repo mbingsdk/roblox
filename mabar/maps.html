@@ -59,7 +59,7 @@
       try {
         const res = await axios.get("https://discord.mbingsdk.my.id/api/roblox/current-room");
         const mapName = res.data?.lastLocation || "Unknown Map"; 
-        document.getElementById("mapName").innerText = mapName;
+        document.getElementById("mapName").innerText = "MAP:" + mapName;
       } catch (err) {
         document.getElementById("mapName").innerText = "Error loading map";
         console.error(err);
