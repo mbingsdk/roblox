@@ -17,12 +17,18 @@
       position: fixed;
       top: 20px;
       right: 20px; /* pojok kanan atas */
-      padding: 10px 20px;
-      border-radius: 12px;
+      padding: 12px 18px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.5); /* transparan biar tetep keliatan stream */
+      border: 2px solid #00f2fe;
+      box-shadow: 0 0 15px rgba(0, 242, 254, 0.7);
+      display: flex;
+      align-items: center;
     }
 
     .map-name {
       font-size: 1.6rem;
+      font-weight: 700; /* tebal */
       color: #00f2fe;
       white-space: nowrap;
       overflow: hidden;
@@ -30,6 +36,7 @@
       width: 0;
       display: inline-block;
       animation: typing 2s steps(30, end) forwards, glow 1.5s ease-in-out infinite alternate;
+      text-shadow: 0 0 3px #00f2fe, 0 0 7px #00f2fe;
     }
 
     @keyframes typing {
@@ -54,6 +61,7 @@
       margin-left: 10px;
       color: #00f2fe;
       transition: transform 0.3s;
+      text-shadow: 0 0 5px #00f2fe;
     }
 
     .refresh-btn:hover {
