@@ -8,112 +8,100 @@
   <style>
     body {
       margin: 0;
-      background: transparent;
+      background: transparent; /* biar nggak nutup stream */
+      font-family: 'Courier New', monospace;
       color: white;
-      font-family: 'Orbitron', sans-serif;
       height: 100vh;
       display: flex;
-      align-items: flex-end;
-      justify-content: flex-end;
+      justify-content: flex-end; /* rata kanan */
+      align-items: flex-start; /* atas */
       padding: 20px;
     }
 
     .overlay {
-      display: flex;
-      align-items: center;
-      gap: 12px;
       padding: 10px 20px;
       border-radius: 12px;
-      background: rgba(0, 0, 0, 0.4);
-      backdrop-filter: blur(6px);
-      box-shadow: 0 0 20px rgba(0, 242, 254, 0.7);
     }
 
     .map-name {
-      font-size: 1.4rem;
-      font-weight: bold;
+      font-size: 1.6rem;
       color: #00f2fe;
       white-space: nowrap;
       overflow: hidden;
-      border-right: 3px solid #00f2fe;
+      border-right: 2px solid #00f2fe;
       width: 0;
-      animation: typing 3s steps(30, end) forwards, blink 0.7s infinite;
+      display: inline-block;
+      animation: typing 2s steps(30, end) forwards, glow 1.5s ease-in-out infinite alternate;
     }
 
-    /* animasi typing */
     @keyframes typing {
       from { width: 0 }
       to { width: 100% }
     }
-    @keyframes blink {
-      50% { border-color: transparent }
-    }
 
-    /* animasi glow */
-    .glow {
-      border-right: none;
-      animation: glow 2s ease-in-out infinite alternate;
-    }
     @keyframes glow {
       from {
-        text-shadow: 0 0 5px #00f2fe, 0 0 10px #4facfe;
-        opacity: 0.8;
+        text-shadow: 0 0 5px #00f2fe, 0 0 10px #00f2fe;
       }
       to {
-        text-shadow: 0 0 20px #00f2fe, 0 0 40px #4facfe, 0 0 60px #0077ff;
-        opacity: 1;
+        text-shadow: 0 0 15px #00f2fe, 0 0 25px #00f2fe;
       }
     }
 
     .refresh-btn {
+      background: transparent;
+      border: none;
       cursor: pointer;
       font-size: 1.4rem;
+      margin-left: 10px;
       color: #00f2fe;
       transition: transform 0.3s;
     }
+
     .refresh-btn:hover {
-      transform: rotate(90deg) scale(1.2);
-      color: #4facfe;
+      transform: rotate(90deg);
     }
   </style>
 </head>
 <body>
   <div class="overlay">
-    <div class="map-name" id="mapName">Loading...</div>
-    <div class="refresh-btn" onclick="fetchMap()">⟳</div>
+    <span id="mapName" class="map-name">Loading...</span>
+    <button class="refresh-btn" onclick="manualRefresh()">🔄</button>
   </div>
 
   <script>
-    async function fetchMap() {
+    let interval;
+
+    async function fetchMap(auto = true) {
       try {
         const res = await axios.get("https://discord.mbingsdk.my.id/api/roblox/current-room");
-        const mapName = res.data?.lastLocation || "Unknown Map"; 
-
-        const mapEl = document.getElementById("mapName");
-        mapEl.classList.remove("glow"); // reset animasi glow
-        mapEl.style.width = "0"; // reset typing
-        mapEl.innerText = "MAP: " + mapName;
-
-        // trigger ulang typing
-        void mapEl.offsetWidth; // hack untuk restart animasi
-        mapEl.style.animation = "typing 3s steps(30, end) forwards, blink 0.7s infinite";
-
-        // setelah typing selesai, ganti ke glow
-        setTimeout(() => {
-          mapEl.classList.add("glow");
-          mapEl.style.animation = "";
-        }, 10000);
+        const mapName = res.data?.lastLocation || "Unknown Map";
+        animateText(mapName);
       } catch (err) {
-        document.getElementById("mapName").innerText = "Error loading map";
+        animateText("Error loading map");
         console.error(err);
+      }
+
+      if (auto) {
+        clearInterval(interval);
+        interval = setInterval(fetchMap, 15000); // refresh tiap 15 detik
       }
     }
 
-    // load pertama kali
-    fetchMap();
+    function animateText(text) {
+      const el = document.getElementById("mapName");
+      el.style.animation = "none"; // reset animasi
+      void el.offsetWidth; // trigger reflow
+      el.textContent = text;
+      el.style.animation = "typing 2s steps(30, end) forwards, glow 1.5s ease-in-out infinite alternate";
+    }
 
-    // auto-refresh tiap 15 detik
-    setInterval(fetchMap, 15000);
+    function manualRefresh() {
+      fetchMap(false);
+    }
+
+    // pertama kali jalan
+    fetchMap();
   </script>
 </body>
 </html>
