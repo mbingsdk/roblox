@@ -8,9 +8,9 @@
   <style>
     body {
       margin: 0;
-      background: #0d0d0f;
+      background: transparent; /* biar ga nutup stream */
       color: white;
-      font-family: Arial, sans-serif;
+      font-family: 'Orbitron', sans-serif;
       height: 100vh;
       display: flex;
       align-items: center;
@@ -18,45 +18,45 @@
     }
 
     .overlay {
-      background: rgba(0,0,0,0.7);
-      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 20px;
       border-radius: 12px;
-      text-align: center;
-      box-shadow: 0 0 20px rgba(0, 242, 254, 0.8);
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(6px);
+      box-shadow: 0 0 20px rgba(0, 242, 254, 0.7);
     }
 
     .map-name {
-      font-size: 1.5rem;
-      margin-bottom: 15px;
-      color: #00f2fe;
-    }
-
-    button {
-      background: linear-gradient(90deg, #4facfe, #00f2fe);
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
+      font-size: 1.4rem;
       font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
+      color: #00f2fe;
+      text-shadow: 0 0 10px #00f2fe, 0 0 20px #4facfe;
     }
 
-    button:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 15px #00f2fe;
+    .refresh-btn {
+      cursor: pointer;
+      font-size: 1.4rem;
+      color: #00f2fe;
+      transition: transform 0.3s;
+    }
+
+    .refresh-btn:hover {
+      transform: rotate(90deg) scale(1.2);
+      color: #4facfe;
     }
   </style>
 </head>
 <body>
   <div class="overlay">
     <div class="map-name" id="mapName">Loading...</div>
-    <button onclick="fetchMap()">🔄 Refresh</button>
+    <div class="refresh-btn" onclick="fetchMap()">⟳</div>
   </div>
 
   <script>
     async function fetchMap() {
       try {
-        // ganti URL API kamu di sini 👇
         const res = await axios.get("https://discord.mbingsdk.my.id/api/roblox/current-room");
         const mapName = res.data?.lastLocation || "Unknown Map"; 
         document.getElementById("mapName").innerText = mapName;
