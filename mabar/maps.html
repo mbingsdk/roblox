@@ -79,18 +79,19 @@
     let interval;
 
     async function fetchMap(auto = true) {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      let url = "https://discord.mbingsdk.my.id/api/roblox/current-room";
+      if (id) {
+        url += `?id=${id}`;
+      }
       try {
-        const res = await axios.get("https://discord.mbingsdk.my.id/api/roblox/current-room");
+        const res = await axios.get(url);
         const mapName = res.data?.lastLocation || "Unknown Map";
         animateText("MAP: "+mapName);
       } catch (err) {
         animateText("Error loading map");
         console.error(err);
-      }
-
-      if (auto) {
-        clearInterval(interval);
-        interval = setInterval(fetchMap, 15000); // refresh tiap 15 detik
       }
     }
 
