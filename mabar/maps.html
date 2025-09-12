@@ -85,6 +85,7 @@
       if (id) {
         url += `?id=${id}`;
       }
+
       try {
         const res = await axios.get(url);
         const mapName = res.data?.lastLocation || "Unknown Map";
@@ -92,6 +93,11 @@
       } catch (err) {
         animateText("Error loading map");
         console.error(err);
+      }
+
+      if (auto) {
+        clearInterval(interval);
+        interval = setInterval(fetchMap, 15000); // refresh tiap 15 detik
       }
     }
 
