@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirecting...</title>
+</head>
+<body>
+  <p id="info">Redirecting...</p>
+
+  <script>
+    // Ambil query parameter ?url=...
+    const params = new URLSearchParams(window.location.search);
+    const targetUrl = params.get("url");
+
+    if (targetUrl) {
+      document.getElementById("info").innerText = `Redirecting to ${targetUrl}...`;
+      // Redirect setelah 1 detik
+      setTimeout(() => {
+        window.location.href = targetUrl;
+      }, 1000);
+    } else {
+      document.getElementById("info").innerText = "No URL parameter provided.";
+    }
+  </script>
+</body>
+</html>
