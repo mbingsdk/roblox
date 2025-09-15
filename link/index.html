@@ -12,7 +12,7 @@
       background: radial-gradient(circle at top, #1a1a1d, #0d0d0f 70%);
       color: #fff;
       margin: 0;
-      padding: 0;
+      padding: 20px;
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -21,14 +21,13 @@
 
     .container {
       text-align: center;
-      max-width: 500px;
-      width: 95%;
-      padding: 30px;
+      max-width: 600px;
+      width: 100%;
     }
 
     h1 {
-      font-size: 2.2rem;
-      margin-bottom: 25px;
+      font-size: 2rem;
+      margin: 20px 0;
       text-transform: uppercase;
       letter-spacing: 2px;
       color: #00f2fe;
@@ -36,32 +35,61 @@
     }
 
     .avatar {
-      width: 150px;
-      height: 150px;
+      width: 120px;
+      height: 120px;
       border-radius: 50%;
       border: 3px solid #00f2fe;
       box-shadow: 0 0 20px rgba(0, 242, 254, 0.8);
       margin-bottom: 15px;
     }
 
-    .links a {
-      display: block;
-      background: linear-gradient(90deg, #4facfe, #00f2fe);
-      color: #0d0d0f;
-      padding: 15px;
-      border-radius: 50px;
-      margin: 14px 0;
-      font-weight: bold;
-      font-size: 1.1rem;
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 15px;
+      margin-top: 25px;
+    }
+
+    .card {
+      background: rgba(0, 242, 254, 0.08);
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      border-radius: 15px;
+      padding: 20px 10px;
       text-decoration: none;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      box-shadow: 0 0 15px rgba(0, 242, 254, 0.7);
+      color: #fff;
+      font-weight: bold;
+      font-size: 1rem;
+      box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);
+      transition: 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(0, 242, 254, 0.8);
+    }
+
+    .socials {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-top: 30px;
+    }
+
+    .socials a {
+      font-size: 1.6rem;
+      color: #00f2fe;
+      text-decoration: none;
       transition: 0.3s;
     }
-    .links a:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 25px rgba(0, 242, 254, 1);
+
+    .socials a:hover {
+      color: #4facfe;
+      transform: scale(1.2);
     }
 
     footer {
@@ -69,33 +97,28 @@
       font-size: 0.8rem;
       opacity: 0.6;
     }
-
-    /* Responsive untuk layar kecil */
-    @media (max-width: 480px) {
-      h1 {
-        font-size: 1.6rem;
-      }
-      .avatar {
-        width: 100px;
-        height: 100px;
-      }
-      .links a {
-        font-size: 0.95rem;
-        padding: 12px;
-      }
-    }
   </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
   <div class="container">
     <img class="avatar" src="https://tr.rbxcdn.com/30DAY-AvatarHeadshot-C54A0819BB9D35EB33371DCDD2CAFBA1-Png/150/150/AvatarHeadshot/Webp/noFilter" alt="Penguin Avatar" />
     <h1>Penguin Antarctica</h1>
 
-    <div class="links">
-      <a href="https://roblox.mbingsdk.my.id/mabar/" target="_blank">🎮 Join Map In Game</a>
-      <a href="https://roblox.mbingsdk.my.id" target="_blank">🕹️ Roblox Profile</a>
-      <a href="https://mbingsdk.my.id/#/discord" target="_blank">💬 Discord Server</a>
-      <a href="https://saweria.co/mbingsdk" target="_blank">💸 Donation Support</a>
+    <!-- Grid links -->
+    <div class="grid">
+      <a class="card" href="https://roblox.mbingsdk.my.id/mabar/" target="_blank">🎮 Join Map</a>
+      <a class="card" href="https://roblox.mbingsdk.my.id" target="_blank">🕹️ Profile</a>
+      <a class="card" href="https://mbingsdk.my.id/#/discord" target="_blank">💬 Discord</a>
+      <a class="card" href="https://saweria.co/mbingsdk" target="_blank">💸 Donasi</a>
+    </div>
+
+    <!-- Sosmed -->
+    <div class="socials">
+      <a href="https://www.tiktok.com/@penguinantarctica_" target="_blank"><i class="fab fa-tiktok"></i></a>
+      <a href="https://youtube.com/@mbingsdk" target="_blank"><i class="fab fa-youtube"></i></a>
+      <a href="https://instagram.com/mbingsdk" target="_blank"><i class="fab fa-instagram"></i></a>
+      <a href="https://mbingsdk.my.id/#/discord" target="_blank"><i class="fab fa-discord"></i></a>
     </div>
 
     <footer>Made with ❤️ by Penguin Antarctica</footer>
