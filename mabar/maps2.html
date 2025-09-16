@@ -8,7 +8,7 @@
   <style>
     body {
       margin: 0;
-      background: transparent; /* biar ga nutup stream */
+      background: transparent;
       font-family: 'Poppins', sans-serif;
       color: #e6f7ff;
     }
@@ -19,13 +19,11 @@
       right: 20px;
       padding: 15px 22px;
       border-radius: 16px;
-      background: rgba(20, 40, 70, 0.85); /* navy transparan */
+      background: rgba(20, 40, 70, 0.85);
       box-shadow: 0 0 15px rgba(0,0,0,0.4), 0 0 10px #66ccff inset;
       border: 2px solid #66ccff;
       display: flex;
       align-items: center;
-      max-width: 380px;
-      overflow: hidden;
     }
 
     .map-name {
@@ -39,7 +37,6 @@
       text-shadow: 0 0 6px #66ccff, 0 0 15px #00f2fe;
     }
 
-    /* glow */
     @keyframes glow {
       from { text-shadow: 0 0 6px #66ccff, 0 0 15px #00f2fe; }
       to   { text-shadow: 0 0 15px #99e6ff, 0 0 30px #00f2fe; }
@@ -65,9 +62,9 @@
       try {
         const res = await axios.get(url);
         const mapName = res.data?.lastLocation || "Unknown Map";
-        updateText("MAP: " + mapName);
+        animateTyping("MAP: " + mapName);
       } catch (err) {
-        updateText("Error loading map");
+        animateTyping("Error loading map sdfasdf f were4 ewds fdsf sd fe");
         console.error(err);
       }
 
@@ -77,28 +74,30 @@
       }
     }
 
-    function updateText(text) {
+    function animateTyping(text) {
       const el = document.getElementById("mapName");
       el.textContent = text;
 
-      // animasi typing dinamis
       const length = text.length;
+
+      // bikin keyframes unik per teks
+      const animName = `typing_${Date.now()}`;
+      const style = document.createElement("style");
+      style.textContent = `
+        @keyframes ${animName} {
+          from { width: 0ch; }
+          to   { width: ${length}ch; }
+        }
+      `;
+      document.head.appendChild(style);
+
+      // reset + apply anim
       el.style.width = "0ch";
       el.style.animation = "none";
       void el.offsetWidth; // reset reflow
       el.style.animation =
-        `typing 2s steps(${length}, end) forwards, glow 1.5s ease-in-out infinite alternate`;
+        `${animName} 2s steps(${length}, end) forwards, glow 1.5s ease-in-out infinite alternate`;
     }
-
-    // bikin typing fleksibel
-    const style = document.createElement("style");
-    style.textContent = `
-      @keyframes typing {
-        from { width: 0ch; }
-        to   { width: 100%; }
-      }
-    `;
-    document.head.appendChild(style);
 
     fetchMap();
   </script>
