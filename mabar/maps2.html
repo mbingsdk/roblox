@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Overlay Map</title>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -17,60 +17,38 @@
       position: fixed;
       top: 20px;
       right: 20px;
-      padding: 12px 18px;
-      border-radius: 14px;
-      background: rgba(20, 40, 70, 0.85); /* semi transparan navy */
+      padding: 15px 22px;
+      border-radius: 16px;
+      background: rgba(20, 40, 70, 0.85); /* navy transparan */
+      box-shadow: 0 0 15px rgba(0,0,0,0.4), 0 0 10px #66ccff inset;
       border: 2px solid #66ccff;
-      box-shadow: 0 0 20px rgba(102, 204, 255, 0.6), 0 0 10px #00334d inset;
       display: flex;
       align-items: center;
-      max-width: 300px;
+      max-width: 380px;
+      overflow: hidden;
     }
 
     .map-name {
-      font-size: 1.4rem;
-      font-weight: 700;
+      font-size: 1.2rem;
+      font-weight: 600;
       color: #b3e0ff;
       white-space: nowrap;
       overflow: hidden;
       border-right: 2px solid #66ccff;
-      width: 0;
       display: inline-block;
-      animation: typing 2s steps(30, end) forwards, glow 1.5s ease-in-out infinite alternate;
       text-shadow: 0 0 6px #66ccff, 0 0 15px #00f2fe;
     }
 
-    @keyframes typing {
-      from { width: 0 }
-      to { width: 100% }
-    }
-
+    /* glow */
     @keyframes glow {
       from { text-shadow: 0 0 6px #66ccff, 0 0 15px #00f2fe; }
-      to { text-shadow: 0 0 15px #99e6ff, 0 0 30px #00f2fe; }
-    }
-
-    .refresh-btn {
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      font-size: 1.3rem;
-      margin-left: 10px;
-      color: #99e6ff;
-      transition: transform 0.3s, color 0.3s;
-      text-shadow: 0 0 5px #66ccff;
-    }
-
-    .refresh-btn:hover {
-      transform: rotate(90deg);
-      color: #ffffff;
+      to   { text-shadow: 0 0 15px #99e6ff, 0 0 30px #00f2fe; }
     }
   </style>
 </head>
 <body>
   <div class="overlay">
     <span id="mapName" class="map-name">Loading...</span>
-    <!-- <button class="refresh-btn" onclick="manualRefresh()">🔄</button> -->
   </div>
 
   <script>
@@ -87,9 +65,9 @@
       try {
         const res = await axios.get(url);
         const mapName = res.data?.lastLocation || "Unknown Map";
-        animateText("MAP: " + mapName);
+        updateText("MAP: " + mapName);
       } catch (err) {
-        animateText("Error loading map");
+        updateText("Error loading map");
         console.error(err);
       }
 
@@ -99,17 +77,28 @@
       }
     }
 
-    function animateText(text) {
+    function updateText(text) {
       const el = document.getElementById("mapName");
+      el.textContent = text;
+
+      // animasi typing dinamis
+      const length = text.length;
+      el.style.width = "0ch";
       el.style.animation = "none";
       void el.offsetWidth; // reset reflow
-      el.textContent = text;
-      el.style.animation = "typing 2s steps(30, end) forwards, glow 1.5s ease-in-out infinite alternate";
+      el.style.animation =
+        `typing 2s steps(${length}, end) forwards, glow 1.5s ease-in-out infinite alternate`;
     }
 
-    function manualRefresh() {
-      fetchMap(false);
-    }
+    // bikin typing fleksibel
+    const style = document.createElement("style");
+    style.textContent = `
+      @keyframes typing {
+        from { width: 0ch; }
+        to   { width: 100%; }
+      }
+    `;
+    document.head.appendChild(style);
 
     fetchMap();
   </script>
