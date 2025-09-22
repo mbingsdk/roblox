@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Overlay Map Cute</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      background: transparent; /* biar nggak nutup stream */
+      font-family: 'Comic Sans MS', 'Nunito', cursive, sans-serif;
+      color: #5c4033; /* coklat lembut */
+    }
+
+    .overlay {
+      position: fixed;
+      top: 20px;
+      right: 20px; /* pojok kanan atas */
+      padding: 14px 22px;
+      border-radius: 18px;
+      background: rgba(255, 240, 245, 0.92); /* pink muda transparan */
+      border: 3px solid #ffb6c1; /* pink pastel */
+      box-shadow: 0 0 12px rgba(255, 182, 193, 0.6);
+      display: flex;
+      align-items: center;
+    }
+
+    .map-name {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #d63384; /* pink cerah */
+      white-space: nowrap;
+      overflow: hidden;
+      display: inline-block;
+      text-shadow: 1px 1px #fff;
+      animation: fadeIn 1s ease, bounce 1s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes bounce {
+      0% { transform: scale(0.9); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay">
+    <span id="mapName" class="map-name">Loading...</span>
+  </div>
+
+  <script>
+    let interval;
+
+    async function fetchMap(auto = true) {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      let url = "https://discord.mbingsdk.my.id/api/roblox/current-room";
+      if (id) {
+        url += `?id=${id}`;
+      }
+
+      try {
+        const res = await axios.get(url);
+        const mapName = res.data?.lastLocation || "Unknown Map";
+        animateText("🌸 MAP: " + mapName + " 🌸");
+      } catch (err) {
+        animateText("❌ Error loading map");
+        console.error(err);
+      }
+
+      if (auto) {
+        clearInterval(interval);
+        interval = setInterval(fetchMap, 15000); // refresh tiap 15 detik
+      }
+    }
+
+    function animateText(text) {
+      const el = document.getElementById("mapName");
+      el.style.animation = "none"; // reset animasi
+      void el.offsetWidth; // trigger reflow
+      el.textContent = text;
+      el.style.animation = "fadeIn 1s ease, bounce 1s ease";
+    }
+
+    // pertama kali jalan
+    fetchMap();
+  </script>
+</body>
+</html>
