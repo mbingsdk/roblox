@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Overlay Map Cute Frost</title>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      background: transparent; /* biar overlay aja */
+      font-family: 'Comic Sans MS', 'Nunito', cursive, sans-serif;
+      color: #033c5a; /* biru laut */
+    }
+
+    .overlay {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 14px 24px;
+      border-radius: 16px;
+      background: rgba(240, 248, 255, 0.85); /* biru pucat transparan */
+      border: 2px solid rgba(173, 216, 230, 0.8); /* biru pastel */
+      backdrop-filter: blur(6px); /* efek kaca es */
+      box-shadow: 0 0 12px rgba(135, 206, 250, 0.6);
+      display: flex;
+      align-items: center;
+    }
+
+    .map-name {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #0077b6; /* biru laut cerah */
+      white-space: nowrap;
+      overflow: hidden;
+      display: inline-block;
+      text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+      animation: fadeIn 1s ease, floaty 3s ease-in-out infinite;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes floaty {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay">
+    <span id="mapName" class="map-name">Loading...</span>
+  </div>
+
+  <script>
+    let interval;
+
+    async function fetchMap(auto = true) {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      let url = "https://discord.mbingsdk.my.id/api/roblox/current-room";
+      if (id) {
+        url += `?id=${id}`;
+      }
+
+      try {
+        const res = await axios.get(url);
+        const mapName = res.data?.lastLocation || "Unknown Map";
+        animateText("❄️ MAP: " + mapName + " ❄️");
+      } catch (err) {
+        animateText("⚠️ Error loading map");
+        console.error(err);
+      }
+
+      if (auto) {
+        clearInterval(interval);
+        interval = setInterval(fetchMap, 15000);
+      }
+    }
+
+    function animateText(text) {
+      const el = document.getElementById("mapName");
+      el.style.animation = "none"; 
+      void el.offsetWidth; 
+      el.textContent = text;
+      el.style.animation = "fadeIn 1s ease, floaty 3s ease-in-out infinite";
+    }
+
+    fetchMap();
+  </script>
+</body>
+</html>
