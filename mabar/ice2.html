@@ -78,7 +78,7 @@
 
       if (auto) {
         clearInterval(interval);
-        interval = setInterval(fetchData, 15000); // refresh data tiap 15 detik
+        interval = setInterval(fetchData, 20000); // refresh data tiap 15 detik
       }
     }
 
@@ -103,7 +103,7 @@
     fetchData();
 
     // Ganti teks MAP ↔ USN tiap 5 detik
-    setInterval(toggleDisplay, 5000);
+    setInterval(toggleDisplay, 10000);
   </script>
 </body>
 </html>
