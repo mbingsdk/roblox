@@ -55,41 +55,54 @@
   </div>
 
   <script>
-    let interval;
+    let intervalFetch;
+    let toggle = true; // true = MAP, false = USERNAME
+    let lastMap = "Unknown Map";
+    let lastUser = "Unknown User";
 
-    async function fetchMap(auto = true) {
+    async function fetchData(auto = true) {
       const params = new URLSearchParams(window.location.search);
       const id = params.get('id');
       let url = "https://discord.mbingsdk.my.id/api/roblox/current-room";
-      if (id) {
-        url += `?id=${id}`;
-      }
+      if (id) url += `?id=${id}`;
 
       try {
         const res = await axios.get(url);
-        const mapName = res.data?.lastLocation || "Unknown Map";
-        animateText("🌸 MAP: " + mapName + " 🌸");
+        lastMap = res.data?.lastLocation || "Unknown Map";
+        lastUser = res.data?.username || "Unknown User";
       } catch (err) {
-        animateText("❌ Error loading map");
         console.error(err);
+        lastMap = "❌ Error loading map";
+        lastUser = "❌ Error loading user";
       }
 
       if (auto) {
-        clearInterval(interval);
-        interval = setInterval(fetchMap, 15000); // refresh tiap 15 detik
+        clearInterval(intervalFetch);
+        intervalFetch = setInterval(fetchData, 20000); // refresh data tiap 20 detik
       }
     }
 
     function animateText(text) {
       const el = document.getElementById("mapName");
       el.style.animation = "none"; // reset animasi
-      void el.offsetWidth; // trigger reflow
+      void el.offsetWidth; // trigger reflow supaya animasi bisa diulang
       el.textContent = text;
       el.style.animation = "fadeIn 1s ease, bounce 1s ease";
     }
 
-    // pertama kali jalan
-    fetchMap();
+    function toggleDisplay() {
+      if (toggle) {
+        animateText(`🌸 MAP: ${lastMap} 🌸`);
+      } else {
+        animateText(`👤 USN: ${lastUser} 🌸`);
+      }
+      toggle = !toggle;
+    }
+
+    // Jalankan pertama kali
+    fetchData();
+    // Ganti tampilan MAP/USN tiap 5 detik
+    setInterval(toggleDisplay, 10000);
   </script>
 </body>
 </html>
