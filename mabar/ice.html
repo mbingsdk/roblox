@@ -8,9 +8,9 @@
   <style>
     body {
       margin: 0;
-      background: transparent; /* biar overlay aja */
+      background: transparent;
       font-family: 'Comic Sans MS', 'Nunito', cursive, sans-serif;
-      color: #033c5a; /* biru laut */
+      color: #033c5a;
     }
 
     .overlay {
@@ -19,9 +19,9 @@
       right: 20px;
       padding: 14px 24px;
       border-radius: 16px;
-      background: rgba(240, 248, 255, 0.85); /* biru pucat transparan */
-      border: 2px solid rgba(173, 216, 230, 0.8); /* biru pastel */
-      backdrop-filter: blur(6px); /* efek kaca es */
+      background: rgba(240, 248, 255, 0.85);
+      border: 2px solid rgba(173, 216, 230, 0.8);
+      backdrop-filter: blur(6px);
       box-shadow: 0 0 12px rgba(135, 206, 250, 0.6);
       display: flex;
       align-items: center;
@@ -30,7 +30,7 @@
     .map-name {
       font-size: 1.4rem;
       font-weight: bold;
-      color: #0077b6; /* biru laut cerah */
+      color: #0077b6;
       white-space: nowrap;
       overflow: hidden;
       display: inline-block;
@@ -56,39 +56,54 @@
 
   <script>
     let interval;
+    let toggle = true; // true = show MAP, false = show USERNAME
+    let lastMap = "Unknown Map";
+    let lastUser = "Unknown User";
 
-    async function fetchMap(auto = true) {
+    async function fetchData(auto = true) {
       const params = new URLSearchParams(window.location.search);
       const id = params.get('id');
       let url = "https://discord.mbingsdk.my.id/api/roblox/current-room";
-      if (id) {
-        url += `?id=${id}`;
-      }
+      if (id) url += `?id=${id}`;
 
       try {
         const res = await axios.get(url);
-        const mapName = res.data?.lastLocation || "Unknown Map";
-        animateText("❄️ MAP: " + mapName + " ❄️");
+        lastMap = res.data?.lastLocation || "Unknown Map";
+        lastUser = res.data?.username || "Unknown User";
       } catch (err) {
-        animateText("⚠️ Error loading map");
         console.error(err);
+        lastMap = "⚠️ Error loading map";
+        lastUser = "⚠️ Error loading user";
       }
 
       if (auto) {
         clearInterval(interval);
-        interval = setInterval(fetchMap, 15000);
+        interval = setInterval(fetchData, 20000); // refresh data tiap 15 detik
       }
     }
 
     function animateText(text) {
       const el = document.getElementById("mapName");
-      el.style.animation = "none"; 
-      void el.offsetWidth; 
+      el.style.animation = "none";
+      void el.offsetWidth;
       el.textContent = text;
       el.style.animation = "fadeIn 1s ease, floaty 3s ease-in-out infinite";
     }
 
-    fetchMap();
+    function toggleDisplay() {
+      if (toggle) {
+        animateText(`❄️ MAP: ${lastMap} ❄️`);
+      } else {
+        animateText(`👤 USN: ${lastUser} ❄️`);
+      }
+      toggle = !toggle;
+    }
+
+    // Fetch pertama
+    fetchData();
+
+    // Ganti teks MAP ↔ USN tiap 5 detik
+    setInterval(toggleDisplay, 10000);
   </script>
 </body>
 </html>
