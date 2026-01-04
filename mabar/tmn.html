@@ -1,65 +1,142 @@
-body {
-  margin: 0;
-  background: transparent;
-  font-family: 'Comic Sans MS', 'Nunito', cursive, sans-serif;
-  color: #1f7a3a;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Garden Overlay Map</title>
 
-.overlay {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  padding: 14px 26px;
-  border-radius: 18px;
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-  /* background taman */
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.95),
-    rgba(126, 246, 85, 0.25)
-  );
+  <style>
+    :root {
+      --green-main: #7EF655;
+      --green-soft: rgba(126, 246, 85, 0.25);
+      --green-glow: rgba(126, 246, 85, 0.6);
+      --green-text: #2e8b57;
+      --white-soft: rgba(255, 255, 255, 0.95);
+    }
 
-  border: 2px solid rgba(126, 246, 85, 0.9);
-  backdrop-filter: blur(6px);
+    body {
+      margin: 0;
+      background: transparent;
+      font-family: 'Comic Sans MS', 'Nunito', cursive, sans-serif;
+      color: var(--green-text);
+    }
 
-  /* glow hijau daun */
-  box-shadow:
-    0 0 12px rgba(126, 246, 85, 0.6),
-    0 0 24px rgba(126, 246, 85, 0.3);
+    .overlay {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 14px 26px;
+      border-radius: 18px;
 
-  display: flex;
-  align-items: center;
-}
+      background: linear-gradient(
+        135deg,
+        var(--white-soft),
+        var(--green-soft)
+      );
 
-.map-name {
-  font-size: 1.4rem;
-  font-weight: bold;
-  white-space: nowrap;
-  overflow: hidden;
-  display: inline-block;
+      border: 2px solid var(--green-main);
+      backdrop-filter: blur(6px);
 
-  /* warna teks utama */
-  color: #2e8b57;
+      box-shadow:
+        0 0 12px var(--green-glow),
+        0 0 24px rgba(126, 246, 85, 0.35);
 
-  text-shadow:
-    1px 1px 2px rgba(255,255,255,0.9),
-    0 0 6px rgba(126, 246, 85, 0.8);
+      display: flex;
+      align-items: center;
+    }
 
-  animation: fadeIn 1s ease, floaty 3s ease-in-out infinite;
-}
+    .overlay span {
+      font-size: 1.4rem;
+      font-weight: bold;
+      white-space: nowrap;
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+      color: var(--green-text);
+      text-shadow:
+        1px 1px 2px rgba(255, 255, 255, 0.9),
+        0 0 6px var(--green-glow);
 
-@keyframes floaty {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
-}
+      animation: fadeIn 1s ease, floaty 3s ease-in-out infinite;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes floaty {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="overlay">
+    <span id="overlayText">Loading garden...</span>
+  </div>
+
+  <script>
+    const overlayText = document.getElementById("overlayText");
+
+    let showMap = true;
+    let lastMap = "Unknown Map";
+    let lastUser = "Unknown User";
+    let refreshTimer;
+
+    const API_URL = "https://discord.mbingsdk.my.id/api/roblox/current-room";
+
+    function getQueryId() {
+      return new URLSearchParams(window.location.search).get("id");
+    }
+
+    function setText(text) {
+      overlayText.style.animation = "none";
+      void overlayText.offsetWidth;
+      overlayText.textContent = text;
+      overlayText.style.animation = "fadeIn 1s ease, floaty 3s ease-in-out infinite";
+    }
+
+    async function fetchData(auto = true) {
+      let url = API_URL;
+      const id = getQueryId();
+      if (id) url += `?id=${id}`;
+
+      try {
+        const res = await axios.get(url);
+        lastMap = res.data?.lastLocation || "Unknown Map";
+        lastUser = res.data?.username || "Unknown User";
+      } catch (err) {
+        console.error(err);
+        lastMap = "⚠️ Failed to load map";
+        lastUser = "⚠️ Failed to load user";
+      }
+
+      if (auto) {
+        clearInterval(refreshTimer);
+        refreshTimer = setInterval(fetchData, 20000);
+      }
+    }
+
+    function toggleDisplay() {
+      if (showMap) {
+        setText(`🌿 MAP: ${lastMap}`);
+      } else {
+        setText(`👤 USER: ${lastUser}`);
+      }
+      showMap = !showMap;
+    }
+
+    fetchData();
+    toggleDisplay();
+    setInterval(toggleDisplay, 10000);
+  </script>
+</body>
+</html>
