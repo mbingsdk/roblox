@@ -131,7 +131,7 @@
       <div class="inner-content" id="donationArea">
         <span class="donator-label">LATEST TRIBUTE</span>
         <div class="donator-name">SAMURAI</div>
-        <div class="donator-msg">"Makasih..."</div>
+        <div class="donator-msg">"Awaiting the next blade..."</div>
       </div>
     </div>
     <div class="amount-tag" id="amountTag">Rp 0</div>
@@ -171,13 +171,13 @@
       void mainBox.offsetWidth; 
       mainBox.classList.add("entry-anim");
 
-      const name = item.donator_name;
+      const name = item.donator;
       const amount = formatter.format(item.amount);
-      const message = item.message ? `"${item.message}"` : "";
+      const message = item.message ? `"${item.message}"` : `"Makasih..."`;
 
       donationArea.innerHTML = `
         <span class="donator-label">LATEST TRIBUTE</span>
-        <div class="donator-name">${donator}</div>
+        <div class="donator-name">${name}</div>
         ${message ? `<div class="donator-msg">${message}</div>` : ''}
       `;
       
