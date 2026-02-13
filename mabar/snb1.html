@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Samurai Overlay Map</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <style>
+    :root {
+      /* Palette Samurai */
+      --samurai-orange: #FF8900;
+      --samurai-glow: rgba(255, 137, 0, 0.6);
+      --dark-bg: rgba(15, 15, 15, 0.85); /* Latar belakang gelap transparan */
+      --text-main: #FFFFFF;
+      --text-accent: #FF8900;
+    }
+
+    body {
+      margin: 0;
+      background: transparent; /* Pastikan transparan untuk OBS/Overlay */
+      font-family: 'Cinzel', serif; /* Font tema kerajaan/samurai */
+      overflow: hidden;
+    }
+
+    .overlay-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      
+      /* Efek miring sedikit agar dinamis */
+      transform: skewX(-10deg); 
+    }
+
+    .overlay {
+      padding: 12px 30px;
+      
+      /* Background Gelap Elegan */
+      background: linear-gradient(
+        90deg,
+        var(--dark-bg) 0%,
+        rgba(30, 30, 30, 0.95) 100%
+      );
+
+      /* Border estetik: Garis tebal di kiri, garis tipis di bawah */
+      border-left: 5px solid var(--samurai-orange);
+      border-bottom: 2px solid var(--samurai-orange);
+      
+      /* Shadow oranye menyala (Glow) */
+      box-shadow: 
+        0 0 15px var(--samurai-glow),
+        inset 0 0 20px rgba(0, 0, 0, 0.8);
+
+      backdrop-filter: blur(4px);
+    }
+
+    /* Mengembalikan kemiringan teks agar tetap tegak lurus */
+    .overlay-content {
+      transform: skewX(10deg);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .label {
+      font-size: 1.2rem;
+      color: var(--text-accent); /* Warna Oranye */
+      font-weight: bold;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-shadow: 0 0 5px var(--samurai-glow);
+    }
+
+    .value {
+      font-size: 1.2rem;
+      color: var(--text-main); /* Warna Putih */
+      font-weight: 600;
+      text-shadow: 1px 1px 2px black;
+      white-space: nowrap;
+    }
+
+    /* Animasi masuk dan berdenyut halus */
+    .fade-in {
+      animation: fadeInSlash 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+    }
+
+    @keyframes fadeInSlash {
+      from {
+        opacity: 0;
+        transform: translateX(20px); /* Muncul dari samping seperti tebasan */
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="overlay-container">
+    <div class="overlay">
+      <div class="overlay-content" id="contentArea">
+        <span class="label">STATUS</span>
+        <span class="value">Loading...</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const contentArea = document.getElementById("contentArea");
+
+    let showMap = true;
+    let lastMap = "Unknown Realm";
+    let lastUser = "Unknown Ronin";
+    let refreshTimer;
+
+    const API_URL = "https://discord.mbingsdk.my.id/api/roblox/current-room";
+
+    function getQueryId() {
+      return new URLSearchParams(window.location.search).get("id");
+    }
+
+    // Fungsi update tampilan dengan animasi ulang
+    function updateDisplay(labelHtml, valueText) {
+      // Hapus konten lama
+      contentArea.style.opacity = 0;
+      
+      setTimeout(() => {
+        contentArea.innerHTML = `
+          <span class="label">${labelHtml}</span>
+          <span class="value">${valueText}</span>
+        `;
+        contentArea.style.opacity = 1;
+        
+        // Reset animasi pada container utama (opsional, biar ada efek 'kedip')
+        const container = document.querySelector('.overlay');
+        container.classList.remove('fade-in');
+        void container.offsetWidth; // trigger reflow
+        container.classList.add('fade-in');
+      }, 200); // delay dikit biar smooth
+    }
+
+    async function fetchData(auto = true) {
+      let url = API_URL;
+      const id = getQueryId();
+      if (id) url += `?id=${id}`;
+
+      try {
+        const res = await axios.get(url);
+        lastMap = res.data?.lastLocation || "Unknown Realm";
+        lastUser = res.data?.username || "Unknown Ronin";
+      } catch (err) {
+        console.error(err);
+        lastMap = "⚠️ Connection Lost";
+        lastUser = "⚠️ User not found";
+      }
+
+      if (auto) {
+        clearInterval(refreshTimer);
+        refreshTimer = setInterval(fetchData, 20000);
+      }
+    }
+
+    function toggleDisplay() {
+      if (showMap) {
+        // Menggunakan ikon Kastil Jepang untuk Map
+        updateDisplay("🏯 MAP", lastMap);
+      } else {
+        // Menggunakan ikon Pedang Silang untuk User
+        updateDisplay("⚔️ USER", lastUser);
+      }
+      showMap = !showMap;
+    }
+
+    fetchData();
+    toggleDisplay();
+    setInterval(toggleDisplay, 10000);
+  </script>
+</body>
+</html>
