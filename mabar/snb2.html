@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Samurai Overlay Ultimate</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <style>
+    :root {
+      --orange-main: #FF8900;
+      --orange-glow: rgba(255, 137, 0, 0.5);
+      --bg-dark: rgba(10, 10, 10, 0.9);
+      --text-white: #F0F0F0;
+    }
+
+    body {
+      margin: 0;
+      background: transparent;
+      font-family: 'Cinzel', serif;
+      overflow: hidden;
+    }
+
+    /* Container utama agar miring */
+    .samurai-box {
+      position: fixed;
+      top: 25px;
+      right: 25px;
+      
+      display: flex;
+      align-items: center;
+      padding: 10px 25px;
+      
+      background-color: var(--bg-dark);
+      /* Pola Grid Halus (Texture) */
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 20px 20px;
+
+      /* Bentuk miring & Border */
+      transform: skewX(-15deg);
+      border-left: 6px solid var(--orange-main);
+      border-right: 2px solid var(--orange-main);
+      
+      box-shadow: 
+        0 0 15px var(--orange-glow),
+        inset 0 0 30px rgba(0,0,0,0.8);
+        
+      /* Agar efek kilatan tidak keluar kotak */
+      overflow: hidden; 
+      transition: all 0.3s ease;
+    }
+
+    /* Efek Kilatan (Shimmer) Pedang */
+    .samurai-box::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -150%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.4), 
+        transparent
+      );
+      transform: skewX(-20deg);
+      animation: sheen 4s infinite; /* Berkilau tiap 4 detik */
+    }
+
+    /* Area konten diluruskan kembali */
+    .content {
+      transform: skewX(15deg); /* Counter-skew agar teks tegak */
+      display: flex;
+      flex-direction: column; /* Label di atas, Value di bawah (Opsional, atau sejajar) */
+      align-items: flex-start;
+      line-height: 1.1;
+    }
+
+    /* Label kecil di atas (MAP / USER) */
+    .label-mini {
+      font-size: 0.75rem;
+      color: var(--orange-main);
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+      text-shadow: 0 0 5px var(--orange-glow);
+    }
+
+    /* Teks Utama (Isi Map / Nama User) */
+    .value-main {
+      font-size: 1.3rem;
+      color: var(--text-white);
+      font-weight: 600;
+      white-space: nowrap;
+      text-shadow: 2px 2px 0px #000;
+      position: relative;
+    }
+
+    /* Animasi Masuk/Keluar Teks (Flip effect) */
+    .flip-in {
+      animation: flipIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes flipIn {
+      0% {
+        opacity: 0;
+        transform: rotateX(-90deg);
+      }
+      100% {
+        opacity: 1;
+        transform: rotateX(0deg);
+      }
+    }
+
+    /* Animasi Kilatan */
+    @keyframes sheen {
+      0% { left: -150%; }
+      20% { left: 150%; } /* Cepat lewat */
+      100% { left: 150%; } /* Diam sisanya */
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="samurai-box">
+    <div class="content" id="displayArea">
+      <div class="label-mini">SYSTEM</div>
+      <div class="value-main">Initializing...</div>
+    </div>
+  </div>
+
+  <script>
+    const displayArea = document.getElementById("displayArea");
+
+    let showMap = true;
+    let lastMap = "Unknown Realm";
+    let lastUser = "Unknown Ronin";
+    let refreshTimer;
+
+    const API_URL = "https://discord.mbingsdk.my.id/api/roblox/current-room";
+
+    function getQueryId() {
+      return new URLSearchParams(window.location.search).get("id");
+    }
+
+    // Fungsi Render dengan Animasi Flip
+    function render(label, value, icon) {
+      // Hapus kelas animasi sebentar untuk reset
+      displayArea.classList.remove("flip-in");
+      
+      // Force Reflow (trik CSS agar animasi bisa restart)
+      void displayArea.offsetWidth; 
+      
+      // Update HTML
+      displayArea.innerHTML = `
+        <div class="label-mini">${icon} ${label}</div>
+        <div class="value-main">${value}</div>
+      `;
+      
+      // Pasang animasi lagi
+      displayArea.classList.add("flip-in");
+    }
+
+    async function fetchData(auto = true) {
+      let url = API_URL;
+      const id = getQueryId();
+      if (id) url += `?id=${id}`;
+
+      try {
+        const res = await axios.get(url);
+        lastMap = res.data?.lastLocation || "Unknown Realm";
+        lastUser = res.data?.username || "Unknown Ronin";
+      } catch (err) {
+        console.error(err);
+        lastMap = "⚠️ Disconnected";
+        lastUser = "⚠️ No Data";
+      }
+
+      if (auto) {
+        clearInterval(refreshTimer);
+        refreshTimer = setInterval(fetchData, 20000);
+      }
+    }
+
+    function toggleDisplay() {
+      if (showMap) {
+        // Label MAP
+        render("CURRENT LOCATION", lastMap, "🏯");
+      } else {
+        // Label USER
+        render("ACTIVE RONIN", lastUser, "⚔️");
+      }
+      showMap = !showMap;
+    }
+
+    // Mulai
+    fetchData();
+    // Delay sedikit agar data terambil dulu sebelum render pertama
+    setTimeout(toggleDisplay, 500); 
+    setInterval(toggleDisplay, 8000); // Ganti tiap 8 detik
+  </script>
+</body>
+</html>
