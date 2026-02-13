@@ -3,235 +3,199 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Samurai Donation Ticker (Secure)</title>
+  <title>Bushido Scroll Donation</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@800&family=RocknRoll+One&display=swap" rel="stylesheet">
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
   <style>
     :root {
-      --orange-main: #FF8900;
-      --orange-glow: rgba(255, 137, 0, 0.6);
-      --bg-dark: rgba(10, 10, 10, 0.9);
-      --text-white: #F0F0F0;
-      --money-green: #7EF655;
-      --error-red: #FF4444;
+      --samurai-orange: #FF8900;
+      --scroll-paper: #f2e8cf; /* Warna kertas kuno */
+      --ink-black: #1a1a1a;
+      --ink-glow: rgba(255, 137, 0, 0.3);
     }
 
     body {
       margin: 0;
       background: transparent;
-      font-family: 'Cinzel', serif;
       overflow: hidden;
+      font-family: 'RocknRoll One', sans-serif;
     }
 
-    /* === Container Samurai === */
-    .samurai-box {
+    /* === Desain Gulungan (Scroll) === */
+    .scroll-container {
       position: fixed;
-      top: 25px;
-      right: 25px; 
-      
+      top: 30px;
+      right: 30px;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      padding: 12px 25px;
-      width: 320px; /* Lebar tetap agar rapi */
-      min-height: 60px;
-      
-      background-color: var(--bg-dark);
-      background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-      background-size: 20px 20px;
+      align-items: flex-end;
+    }
 
-      transform: skewX(-15deg);
-      border-left: 6px solid var(--orange-main);
-      border-right: 2px solid var(--orange-main);
-      border-top: 1px solid rgba(255, 137, 0, 0.3);
+    .scroll-body {
+      position: relative;
+      background: var(--scroll-paper);
+      padding: 15px 40px;
+      min-width: 280px;
+      
+      /* Efek Melengkung seperti Gulungan Kertas */
+      border-top: 4px solid #3d3d3d;
+      border-bottom: 4px solid #3d3d3d;
+      border-radius: 40px / 10px; 
       
       box-shadow: 
-        0 0 15px var(--orange-glow),
-        inset 0 0 30px rgba(0,0,0,0.8);
+        5px 5px 15px rgba(0,0,0,0.4),
+        inset 0 0 50px rgba(188, 133, 45, 0.2);
         
-      overflow: hidden; 
+      /* Garis dekoratif di pinggir */
+      border-right: 15px solid var(--samurai-orange);
     }
 
-    /* Efek Kilatan (Shimmer) */
-    .samurai-box::after {
-      content: '';
+    /* Aksen Tali/Pengikat di sisi kiri */
+    .scroll-body::before {
+      content: "";
       position: absolute;
+      left: 10px;
       top: 0;
-      left: -150%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(
-        90deg, 
-        transparent, 
-        rgba(255, 255, 255, 0.4), 
-        transparent
-      );
-      transform: skewX(-20deg);
-      animation: sheen 6s infinite;
+      bottom: 0;
+      width: 4px;
+      background: var(--ink-black);
+      opacity: 0.2;
     }
 
-    @keyframes sheen {
-      0%, 40% { left: -150%; }
-      50% { left: 150%; }
-      100% { left: 150%; }
-    }
-
-    /* === Konten === */
+    /* === Konten Teks === */
     .content {
-      transform: skewX(15deg); /* Tegakkan kembali */
-      width: 100%;
       display: flex;
       flex-direction: column;
-    }
-
-    .header-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 4px;
-      border-bottom: 1px solid rgba(255, 137, 0, 0.3);
-      padding-bottom: 2px;
+      text-align: right;
     }
 
     .label-tribute {
-      font-size: 0.7rem;
-      color: var(--orange-main);
+      font-family: 'Cinzel', serif;
+      font-size: 0.8rem;
+      color: #7d2a1a; /* Merah stempel kuno */
+      letter-spacing: 2px;
       font-weight: 800;
-      letter-spacing: 1px;
-    }
-
-    .amount {
-      font-size: 1.1rem;
-      color: var(--money-green);
-      font-weight: bold;
-      text-shadow: 0 0 5px rgba(126, 246, 85, 0.4);
+      margin-bottom: 2px;
     }
 
     .donator-name {
-      font-size: 1.3rem;
-      color: var(--text-white);
-      font-weight: 700;
-      text-transform: uppercase;
-      text-shadow: 2px 2px 0 #000;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-size: 1.6rem;
+      color: var(--ink-black);
+      line-height: 1.1;
+      margin-bottom: 5px;
+      /* Efek Tinta */
+      filter: drop-shadow(1px 1px 0px rgba(255,137,0,0.2));
     }
 
-    .donator-msg {
-      font-family: 'Lato', sans-serif;
-      font-size: 0.9rem;
-      color: #ccc;
+    .amount-box {
+      display: inline-block;
+      background: var(--ink-black);
+      color: var(--samurai-orange);
+      padding: 2px 12px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      align-self: flex-end;
+      transform: rotate(-1deg); /* Sedikit miring biar estetik */
+      box-shadow: 3px 3px 0px var(--samurai-orange);
+    }
+
+    .message {
+      font-size: 0.85rem;
+      color: #444;
+      margin-top: 8px;
       font-style: italic;
-      margin-top: 2px;
-      line-height: 1.2;
-      display: -webkit-box;
-      -webkit-line-clamp: 2; /* Batasi pesan max 2 baris */
-      -webkit-box-orient: vertical;
-      overflow: hidden;
+      border-right: 2px solid var(--samurai-orange);
+      padding-right: 8px;
+      max-width: 250px;
     }
 
-    /* Error State */
-    .error-msg {
-        color: var(--error-red);
-        font-weight: bold;
-        text-shadow: 0 0 5px red;
+    /* === Animasi: Muncul seperti gulungan dibuka === */
+    .roll-animation {
+      animation: openScroll 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+      transform-origin: right;
     }
 
-    /* === Animasi Pergantian (Flip) === */
-    .flip-in {
-      animation: flipIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    @keyframes openScroll {
+      from {
+        opacity: 0;
+        transform: scaleX(0);
+      }
+      to {
+        opacity: 1;
+        transform: scaleX(1);
+      }
     }
 
-    @keyframes flipIn {
-      0% { opacity: 0; transform: translateY(15px); }
-      100% { opacity: 1; transform: translateY(0); }
+    /* Animasi Teks */
+    .fade-text {
+      animation: fadeInText 0.5s ease-out forwards;
+    }
+
+    @keyframes fadeInText {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 
 <body>
-  <div class="samurai-box">
-    <div class="content" id="donationArea">
-      <div class="header-row">
-        <span class="label-tribute">SYSTEM</span>
+
+  <div class="scroll-container">
+    <div class="scroll-body roll-animation" id="scrollBox">
+      <div class="content" id="donationArea">
+        <div class="label-tribute">PREPARING...</div>
+        <div class="donator-name">BUSHIDO</div>
       </div>
-      <div class="donator-name" style="font-size: 1rem;">INITIALIZING...</div>
     </div>
   </div>
 
   <script>
     const donationArea = document.getElementById("donationArea");
+    const scrollBox = document.getElementById("scrollBox");
     const API_URL = "https://backend.saweria.co/widgets/recent";
 
-    // 1. AMBIL KEY DARI URL PARAMETER
     const urlParams = new URLSearchParams(window.location.search);
     const STREAM_KEY = urlParams.get('streamKey');
 
     let donations = [];
     let currentIndex = 0;
-    
-    // Format Rupiah
+
     const formatter = new Intl.NumberFormat('id-ID', {
       style: 'currency',
       currency: 'IDR',
       minimumFractionDigits: 0
     });
 
-    // Fungsi Render Error jika Key tidak ada
     function renderError(msg) {
-        donationArea.innerHTML = `
-            <div class="header-row">
-                <span class="label-tribute" style="color:var(--error-red)">⚠️ ERROR</span>
-            </div>
-            <div class="donator-name error-msg">${msg}</div>
-        `;
+        donationArea.innerHTML = `<div class="donator-name" style="color:red; font-size:1rem;">${msg}</div>`;
     }
 
     async function fetchDonations() {
-      // Cek apakah key ada
       if (!STREAM_KEY) {
-          renderError("MISSING STREAM KEY");
+          renderError("MISSING KEY");
           return;
       }
-
       try {
-        const res = await axios.get(API_URL, {
-          headers: {
-            'Stream-Key': STREAM_KEY
-          }
-        });
-        
+        const res = await axios.get(API_URL, { headers: { 'Stream-Key': STREAM_KEY } });
         if (res.data && res.data.data) {
           donations = res.data.data;
-          
-          // Jika belum ada donasi sama sekali
-          if (donations.length === 0) {
-              renderEmpty();
-          }
+          if (donations.length === 0) renderEmpty();
         }
       } catch (err) {
-        console.error("Gagal ambil data Saweria:", err);
-        renderError("CONNECTION FAILED");
+        renderError("CONN ERROR");
       }
     }
 
     function renderEmpty() {
         donationArea.innerHTML = `
-        <div class="header-row">
-          <span class="label-tribute">LATEST TRIBUTE</span>
-          <span class="amount">-</span>
-        </div>
-        <div class="donator-name" style="font-size: 1rem; color: #888;">NO TRIBUTES YET</div>
-      `;
+          <div class="label-tribute">WAITED FOR TRIBUTE</div>
+          <div class="donator-name">NO ONE YET</div>
+        `;
     }
 
     function renderDonation() {
@@ -239,46 +203,35 @@
 
       const item = donations[currentIndex];
       
-      // Reset Animasi
-      donationArea.classList.remove("flip-in");
-      void donationArea.offsetWidth; // Trigger reflow
+      // Reset Animasi Gulungan (Opsional: biarkan terbuka saja, teksnya saja yang fade)
+      donationArea.classList.remove("fade-text");
+      void donationArea.offsetWidth; 
 
       const name = item.donator_name;
       const amount = formatter.format(item.amount);
       const message = item.message ? `"${item.message}"` : "";
 
       donationArea.innerHTML = `
-        <div class="header-row">
-          <span class="label-tribute">💎 LATEST TRIBUTE</span>
-          <span class="amount">${amount}</span>
-        </div>
+        <div class="label-tribute">🏯 LATEST TRIBUTE</div>
         <div class="donator-name">${name}</div>
-        ${message ? `<div class="donator-msg">${message}</div>` : ''}
+        <div class="amount-box">${amount}</div>
+        ${message ? `<div class="message">${message}</div>` : ''}
       `;
 
-      donationArea.classList.add("flip-in");
+      donationArea.classList.add("fade-text");
 
-      // Loop max 5 donasi terakhir
       const maxShow = Math.min(donations.length, 5);
       currentIndex = (currentIndex + 1) % maxShow;
     }
 
-    // Main Logic
-    if (!STREAM_KEY) {
-        renderError("MISSING STREAM KEY");
-    } else {
-        // Fetch pertama
+    if (STREAM_KEY) {
         fetchDonations().then(() => {
             if(donations.length > 0) renderDonation();
-            
-            // Ganti slide tiap 5 detik
-            setInterval(() => {
-                if(donations.length > 0) renderDonation();
-            }, 5000);
-            
-            // Ambil data baru tiap 15 detik
-            setInterval(fetchDonations, 15000);
+            setInterval(() => { if(donations.length > 0) renderDonation(); }, 7000);
+            setInterval(fetchDonations, 20000);
         });
+    } else {
+        renderError("ADD ?streamKey=...");
     }
   </script>
 </body>
