@@ -3,23 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Samurai Donation Ticker (Secure)</title>
+  <title>Samurai Blade Donation</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Lato:ital,wght@1,400&display=swap" rel="stylesheet">
 
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
   <style>
     :root {
-      --orange-main: #FF8900;
-      --orange-glow: rgba(255, 137, 0, 0.6);
-      --bg-dark: rgba(10, 10, 10, 0.9);
-      --text-white: #F0F0F0;
-      --money-green: #7EF655;
-      --error-red: #FF4444;
+      --samurai-orange: #FF8900;
+      --samurai-glow: rgba(255, 137, 0, 0.5);
+      --bg-black: rgba(10, 10, 10, 0.9);
+      --text-white: #ffffff;
     }
 
     body {
@@ -29,256 +26,175 @@
       overflow: hidden;
     }
 
-    /* === Container Samurai === */
-    .samurai-box {
+    .wrapper {
       position: fixed;
-      top: 25px;
-      right: 25px; 
-      
+      top: 30px;
+      right: 30px;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      padding: 12px 25px;
-      width: 320px; /* Lebar tetap agar rapi */
-      min-height: 60px;
-      
-      background-color: var(--bg-dark);
-      background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-      background-size: 20px 20px;
-
-      transform: skewX(-15deg);
-      border-left: 6px solid var(--orange-main);
-      border-right: 2px solid var(--orange-main);
-      border-top: 1px solid rgba(255, 137, 0, 0.3);
-      
-      box-shadow: 
-        0 0 15px var(--orange-glow),
-        inset 0 0 30px rgba(0,0,0,0.8);
-        
-      overflow: hidden; 
+      align-items: flex-end;
     }
 
-    /* Efek Kilatan (Shimmer) */
-    .samurai-box::after {
+    /* === Main Blade Box === */
+    .blade-box {
+      position: relative;
+      background: var(--bg-black);
+      padding: 10px 30px;
+      min-width: 250px;
+      transform: skewX(-20deg); /* Lebih miring dari Map agar terlihat lebih tajam */
+      
+      border-right: 8px solid var(--samurai-orange);
+      border-left: 2px solid rgba(255, 137, 0, 0.3);
+      
+      box-shadow: -10px 0 20px rgba(0,0,0,0.5);
+      overflow: hidden;
+    }
+
+    /* Efek Kilatan Pedang (Sama dengan Map agar serasi) */
+    .blade-box::after {
       content: '';
       position: absolute;
-      top: 0;
-      left: -150%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(
-        90deg, 
-        transparent, 
-        rgba(255, 255, 255, 0.4), 
-        transparent
-      );
-      transform: skewX(-20deg);
-      animation: sheen 6s infinite;
+      top: 0; left: -150%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      animation: slash 5s infinite;
     }
 
-    @keyframes sheen {
+    /* === Sub-Tab untuk Harga (Talisman Style) === */
+    .amount-tag {
+      background: var(--samurai-orange);
+      color: #000;
+      font-weight: 900;
+      padding: 4px 15px;
+      font-size: 1rem;
+      margin-top: -2px;
+      margin-right: 15px;
+      transform: skewX(-20deg);
+      box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+      z-index: 2;
+    }
+
+    /* === Teks Konten === */
+    .inner-content {
+      transform: skewX(20deg); /* Meluruskan teks */
+      text-align: right;
+    }
+
+    .donator-label {
+      font-size: 0.7rem;
+      letter-spacing: 3px;
+      color: var(--samurai-orange);
+      margin-bottom: -5px;
+      display: block;
+    }
+
+    .donator-name {
+      font-size: 1.5rem;
+      color: var(--text-white);
+      text-transform: uppercase;
+      text-shadow: 2px 2px 0 #000;
+    }
+
+    .donator-msg {
+      font-family: 'Lato', sans-serif;
+      font-size: 0.85rem;
+      color: #bbb;
+      font-style: italic;
+      max-width: 200px;
+      border-top: 1px solid rgba(255,137,0,0.2);
+      margin-top: 5px;
+      padding-top: 5px;
+    }
+
+    /* === Animasi === */
+    @keyframes slash {
       0%, 40% { left: -150%; }
       50% { left: 150%; }
       100% { left: 150%; }
     }
 
-    /* === Konten === */
-    .content {
-      transform: skewX(15deg); /* Tegakkan kembali */
-      width: 100%;
-      display: flex;
-      flex-direction: column;
+    .entry-anim {
+      animation: entrySlash 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
     }
 
-    .header-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 4px;
-      border-bottom: 1px solid rgba(255, 137, 0, 0.3);
-      padding-bottom: 2px;
-    }
-
-    .label-tribute {
-      font-size: 0.7rem;
-      color: var(--orange-main);
-      font-weight: 800;
-      letter-spacing: 1px;
-    }
-
-    .amount {
-      font-size: 1.1rem;
-      color: var(--money-green);
-      font-weight: bold;
-      text-shadow: 0 0 5px rgba(126, 246, 85, 0.4);
-    }
-
-    .donator-name {
-      font-size: 1.3rem;
-      color: var(--text-white);
-      font-weight: 700;
-      text-transform: uppercase;
-      text-shadow: 2px 2px 0 #000;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .donator-msg {
-      font-family: 'Lato', sans-serif;
-      font-size: 0.9rem;
-      color: #ccc;
-      font-style: italic;
-      margin-top: 2px;
-      line-height: 1.2;
-      display: -webkit-box;
-      -webkit-line-clamp: 2; /* Batasi pesan max 2 baris */
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-
-    /* Error State */
-    .error-msg {
-        color: var(--error-red);
-        font-weight: bold;
-        text-shadow: 0 0 5px red;
-    }
-
-    /* === Animasi Pergantian (Flip) === */
-    .flip-in {
-      animation: flipIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-    }
-
-    @keyframes flipIn {
-      0% { opacity: 0; transform: translateY(15px); }
-      100% { opacity: 1; transform: translateY(0); }
+    @keyframes entrySlash {
+      0% { opacity: 0; transform: translateX(50px) skewX(-20deg); }
+      100% { opacity: 1; transform: translateX(0) skewX(-20deg); }
     }
   </style>
 </head>
 
 <body>
-  <div class="samurai-box">
-    <div class="content" id="donationArea">
-      <div class="header-row">
-        <span class="label-tribute">SYSTEM</span>
+
+  <div class="wrapper">
+    <div class="blade-box entry-anim" id="mainBox">
+      <div class="inner-content" id="donationArea">
+        <span class="donator-label">LATEST TRIBUTE</span>
+        <div class="donator-name">SAMURAI</div>
+        <div class="donator-msg">"Awaiting the next blade..."</div>
       </div>
-      <div class="donator-name" style="font-size: 1rem;">INITIALIZING...</div>
     </div>
+    <div class="amount-tag" id="amountTag">Rp 0</div>
   </div>
 
   <script>
     const donationArea = document.getElementById("donationArea");
+    const amountTag = document.getElementById("amountTag");
+    const mainBox = document.getElementById("mainBox");
+    
     const API_URL = "https://backend.saweria.co/widgets/recent";
-
-    // 1. AMBIL KEY DARI URL PARAMETER
     const urlParams = new URLSearchParams(window.location.search);
     const STREAM_KEY = urlParams.get('streamKey');
 
     let donations = [];
     let currentIndex = 0;
-    
-    // Format Rupiah
+
     const formatter = new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0
+      style: 'currency', currency: 'IDR', minimumFractionDigits: 0
     });
 
-    // Fungsi Render Error jika Key tidak ada
-    function renderError(msg) {
-        donationArea.innerHTML = `
-            <div class="header-row">
-                <span class="label-tribute" style="color:var(--error-red)">⚠️ ERROR</span>
-            </div>
-            <div class="donator-name error-msg">${msg}</div>
-        `;
-    }
-
     async function fetchDonations() {
-      // Cek apakah key ada
-      if (!STREAM_KEY) {
-          renderError("MISSING STREAM KEY");
-          return;
-      }
-
+      if (!STREAM_KEY) return;
       try {
-        const res = await axios.get(API_URL, {
-          headers: {
-            'Stream-Key': STREAM_KEY
-          }
-        });
-        
-        if (res.data && res.data.data) {
-          donations = res.data.data;
-          
-          // Jika belum ada donasi sama sekali
-          if (donations.length === 0) {
-              renderEmpty();
-          }
-        }
-      } catch (err) {
-        console.error("Gagal ambil data Saweria:", err);
-        renderError("CONNECTION FAILED");
-      }
-    }
-
-    function renderEmpty() {
-        donationArea.innerHTML = `
-        <div class="header-row">
-          <span class="label-tribute">LATEST TRIBUTE</span>
-          <span class="amount">-</span>
-        </div>
-        <div class="donator-name" style="font-size: 1rem; color: #888;">NO TRIBUTES YET</div>
-      `;
+        const res = await axios.get(API_URL, { headers: { 'Stream-Key': STREAM_KEY } });
+        if (res.data?.data) donations = res.data.data;
+      } catch (err) { console.error(err); }
     }
 
     function renderDonation() {
-      if (!donations || donations.length === 0) return;
+      if (!donations.length) return;
 
       const item = donations[currentIndex];
       
-      // Reset Animasi
-      donationArea.classList.remove("flip-in");
-      void donationArea.offsetWidth; // Trigger reflow
+      // Reset Animasi Slash
+      mainBox.classList.remove("entry-anim");
+      void mainBox.offsetWidth; 
+      mainBox.classList.add("entry-anim");
 
       const name = item.donator_name;
       const amount = formatter.format(item.amount);
       const message = item.message ? `"${item.message}"` : "";
 
       donationArea.innerHTML = `
-        <div class="header-row">
-          <span class="label-tribute">💎 LATEST TRIBUTE</span>
-          <span class="amount">${amount}</span>
-        </div>
+        <span class="donator-label">LATEST TRIBUTE</span>
         <div class="donator-name">${name}</div>
         ${message ? `<div class="donator-msg">${message}</div>` : ''}
       `;
+      
+      amountTag.textContent = amount;
 
-      donationArea.classList.add("flip-in");
-
-      // Loop max 5 donasi terakhir
       const maxShow = Math.min(donations.length, 5);
       currentIndex = (currentIndex + 1) % maxShow;
     }
 
-    // Main Logic
-    if (!STREAM_KEY) {
-        renderError("MISSING STREAM KEY");
+    if (STREAM_KEY) {
+      fetchDonations().then(() => {
+        if(donations.length > 0) renderDonation();
+        setInterval(() => { if(donations.length > 0) renderDonation(); }, 8000);
+        setInterval(fetchDonations, 20000);
+      });
     } else {
-        // Fetch pertama
-        fetchDonations().then(() => {
-            if(donations.length > 0) renderDonation();
-            
-            // Ganti slide tiap 5 detik
-            setInterval(() => {
-                if(donations.length > 0) renderDonation();
-            }, 5000);
-            
-            // Ambil data baru tiap 15 detik
-            setInterval(fetchDonations, 15000);
-        });
+      donationArea.innerHTML = "<div style='color:red'>MISSING KEY</div>";
     }
   </script>
 </body>
