@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Samurai Music Widget - Expanded</title>
+  <title>Samurai Music Playlist Widget</title>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
   <style>
     :root {
       --samurai-orange: #FF8900;
-      --bg-dark: rgba(15, 15, 15, 0.95);
-      --glow: rgba(255, 137, 0, 0.3);
+      --bg-dark: rgba(12, 12, 12, 0.95);
+      --glow: rgba(255, 137, 0, 0.2);
     }
     
     body { 
@@ -18,143 +18,134 @@
       overflow: hidden; 
     }
 
-    /* Container Utama yang lebih tinggi */
-    .player-container {
+    .wrapper {
       position: fixed;
-      top: 10px;
-      left: 10px;
-      width: 350px;
-      height: 600px; /* Ditambah tingginya menjadi 600px */
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end; /* Memaksa UI Player tetap di paling bawah */
+      top: 20px;
+      left: 20px;
+      width: 360px;
     }
 
-    /* Area Kosong untuk Playlist kamu */
-    .playlist-placeholder {
-      height: 450px; /* Area sangat luas untuk menaruh playlist manual */
-      width: 100%;
-      /* background: rgba(255, 137, 0, 0.05); /* Aktifkan jika ingin melihat batas area saat setting */
-      margin-bottom: 5px;
-    }
-
-    /* UI Player Modern Samurai */
-    .player-ui {
+    /* Box Utama Samurai */
+    .player-card {
       background: var(--bg-dark);
-      padding: 20px;
       transform: skewX(-15deg);
-      border-right: 6px solid var(--samurai-orange);
-      border-top: 2px solid rgba(255, 137, 0, 0.2);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-      /* Pattern Grid */
-      background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-      background-size: 15px 15px;
+      border-left: 6px solid var(--samurai-orange);
+      border-bottom: 2px solid var(--samurai-orange);
+      box-shadow: 10px 10px 25px rgba(0,0,0,0.8);
+      padding: 20px;
+      position: relative;
+      /* Tekstur garis halus */
+      background-image: repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(255,137,0,0.03) 1px, rgba(255,137,0,0.03) 2px);
+      background-size: 100% 4px;
     }
 
-    .inner { 
-      transform: skewX(15deg); /* Mengembalikan teks agar tidak miring */
+    .inner-content {
+      transform: skewX(15deg); /* Meluruskan konten */
     }
 
-    .now-playing-label {
-      font-size: 0.7rem;
+    .status-label {
+      font-size: 0.75rem;
       color: var(--samurai-orange);
-      letter-spacing: 3px;
-      margin-bottom: 10px;
-      display: block;
+      letter-spacing: 4px;
       font-weight: 900;
-    }
-
-    /* Area Judul Lagu (Dikosongkan sesuai permintaan) */
-    .song-title {
-      font-size: 1.2rem;
-      color: #fff;
-      min-height: 1.5rem; /* Menjaga ruang agar tidak kempes */
+      display: block;
       margin-bottom: 15px;
+      border-bottom: 1px solid rgba(255, 137, 0, 0.2);
+      padding-bottom: 5px;
     }
 
-    .controls-row {
+    /* AREA KOSONG UNTUK PLAYLIST (DI BAWAH STATUS) */
+    .playlist-space {
+      /* Tinggi sekitar 160px-180px cukup untuk 5-6 baris teks */
+      min-height: 180px; 
+      width: 100%;
+      margin-bottom: 20px;
+      /* background: rgba(255,255,255,0.02); /* Aktifkan jika ingin melihat areanya saat atur posisi */
+    }
+
+    /* Bagian Kontrol Musik di Bawah */
+    .footer-controls {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 15px;
+      margin-top: 10px;
     }
 
-    .buttons {
+    .btns {
       display: flex;
+      gap: 18px;
       align-items: center;
-      gap: 20px;
     }
 
-    .btn { color: #666; font-size: 1.3rem; cursor: pointer; }
+    .btn { color: #555; font-size: 1.1rem; }
     .btn-play { 
       color: var(--samurai-orange); 
-      font-size: 1.8rem;
-      filter: drop-shadow(0 0 8px var(--glow));
+      font-size: 1.6rem;
+      filter: drop-shadow(0 0 5px var(--samurai-orange));
     }
 
-    /* Visualizer Hiasan */
+    /* Visualizer (EQ) */
     .visualizer {
       display: flex;
-      gap: 4px;
-      height: 20px;
+      gap: 3px;
+      height: 18px;
       align-items: flex-end;
     }
     .bar {
-      width: 4px;
+      width: 3px;
       background: var(--samurai-orange);
-      animation: eq 1s ease-in-out infinite;
+      animation: bounce 1s ease-in-out infinite;
     }
-    @keyframes eq {
+    @keyframes bounce {
       0%, 100% { height: 20%; }
       50% { height: 100%; }
     }
 
-    /* Progress Bar */
-    .progress-track {
+    /* Progress Bar paling bawah */
+    .progress-wrap {
       width: 100%;
-      height: 4px;
+      height: 3px;
       background: #222;
-      position: relative;
+      margin-top: 15px;
+      overflow: hidden;
     }
-    .progress-fill {
+    .progress-bar {
       height: 100%;
       background: var(--samurai-orange);
-      width: 35%; /* Hanya pemanis visual */
+      width: 45%;
       box-shadow: 0 0 10px var(--samurai-orange);
     }
   </style>
 </head>
 <body>
 
-  <div class="player-container">
-    <div class="playlist-placeholder"></div>
+  <div class="wrapper">
+    <div class="player-card">
+      <div class="inner-content">
+        
+        <span class="status-label">PLAYER STATUS</span>
+        
+        <div class="playlist-space"></div>
 
-    <div class="player-ui">
-      <div class="inner">
-        <span class="now-playing-label">PLAYER STATUS</span>
-        
-        <div class="song-title" id="songTitle"></div>
-        
-        <div class="controls-row">
-          <div class="buttons">
+        <div class="footer-controls">
+          <div class="btns">
             <div class="btn">⏮</div>
             <div class="btn btn-play">▶</div>
             <div class="btn">⏭</div>
           </div>
 
           <div class="visualizer">
-            <div class="bar" style="animation-duration: 0.6s"></div>
-            <div class="bar" style="animation-duration: 0.9s"></div>
-            <div class="bar" style="animation-duration: 0.7s"></div>
-            <div class="bar" style="animation-duration: 1.1s"></div>
+            <div class="bar" style="animation-delay: 0.1s"></div>
+            <div class="bar" style="animation-delay: 0.3s"></div>
+            <div class="bar" style="animation-delay: 0.2s"></div>
+            <div class="bar" style="animation-delay: 0.4s"></div>
           </div>
         </div>
 
-        <div class="progress-track">
-          <div class="progress-fill"></div>
+        <div class="progress-wrap">
+          <div class="progress-bar"></div>
         </div>
+
       </div>
     </div>
   </div>
