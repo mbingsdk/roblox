@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Samurai Command Guide</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --samurai-orange: #FF8900;
+      --bg-dark: rgba(10, 10, 10, 0.9);
+      --text-white: #ffffff;
+      --glow: rgba(255, 137, 0, 0.4);
+    }
+
+    body {
+      margin: 0;
+      background: transparent;
+      font-family: 'Cinzel', serif;
+      overflow: hidden;
+    }
+
+    .info-panel {
+      position: fixed;
+      top: 150px; /* Diatur agar tidak bertabrakan dengan overlay atas */
+      left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      animation: slideIn 0.8s ease-out forwards;
+    }
+
+    /* === Header Panel === */
+    .panel-header {
+      background: var(--samurai-orange);
+      color: #000;
+      padding: 5px 20px;
+      font-weight: 900;
+      font-size: 0.9rem;
+      letter-spacing: 2px;
+      transform: skewX(-15deg);
+      width: fit-content;
+      box-shadow: 0 0 15px var(--glow);
+    }
+
+    /* === Command Box (Music) === */
+    .command-box {
+      background: var(--bg-dark);
+      border-left: 4px solid var(--samurai-orange);
+      padding: 12px 20px;
+      transform: skewX(-15deg);
+      border-bottom: 1px solid rgba(255,137,0,0.3);
+    }
+
+    .command-inner {
+      transform: skewX(15deg); /* Luruskan teks */
+    }
+
+    .music-title {
+      font-size: 0.65rem;
+      color: var(--samurai-orange);
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .command-syntax {
+      font-family: monospace;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 4px 8px;
+      color: #fff;
+      font-size: 1rem;
+      border: 1px dashed var(--samurai-orange);
+    }
+
+    /* === List Link Section === */
+    .links-box {
+      background: rgba(20, 20, 20, 0.85);
+      padding: 15px 20px;
+      transform: skewX(-15deg);
+      border-left: 4px solid var(--samurai-orange);
+      backdrop-filter: blur(5px);
+    }
+
+    .links-inner {
+      transform: skewX(15deg);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .link-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Lato', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text-white);
+      transition: 0.3s;
+    }
+
+    .link-item b {
+      color: var(--samurai-orange);
+      font-family: 'Cinzel', serif;
+      font-size: 0.8rem;
+    }
+
+    .bio-footer {
+      font-size: 0.7rem;
+      color: #888;
+      margin-top: 10px;
+      text-align: center;
+      font-style: italic;
+    }
+
+    /* === Animasi === */
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-50px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* Efek Berdenyut pada Command */
+    .pulse {
+      animation: pulseAnim 2s infinite;
+    }
+
+    @keyframes pulseAnim {
+      0% { text-shadow: 0 0 0px var(--samurai-orange); }
+      50% { text-shadow: 0 0 10px var(--samurai-orange); }
+      100% { text-shadow: 0 0 0px var(--samurai-orange); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="info-panel">
+    <div class="panel-header">STREAM COMMANDS</div>
+
+    <div class="command-box">
+      <div class="command-inner">
+        <span class="music-title">🎵 REQUEST MUSIC</span>
+        <span class="command-syntax pulse">/play judul-artist</span>
+      </div>
+    </div>
+
+    <div class="links-box">
+      <div class="links-inner">
+        <div class="link-item"><b>👤</b> Profile Roblox</div>
+        <div class="link-item"><b>🏯</b> Join Current Map</div>
+        <div class="link-item"><b>🛰️</b> Join Discord</div>
+        <div class="link-item"><b>💎</b> Support Donation</div>
+        
+        <div class="bio-footer">Check link in bio for access!</div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
