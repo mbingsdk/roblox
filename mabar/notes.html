@@ -2,228 +2,91 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Samurai Music Wide</title>
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-
+  <title>Samurai Info Rotator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Lato:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --samurai-orange: #FF8900;
-      --bg-dark: rgba(12, 12, 12, 0.95);
+      --bg-dark: rgba(10, 10, 10, 0.9);
       --text-white: #ffffff;
-      --glow: rgba(255, 137, 0, 0.6);
     }
+    body { margin: 0; background: transparent; font-family: 'Cinzel', serif; overflow: hidden; }
 
-    body {
-      margin: 0;
-      background: transparent;
-      overflow: hidden;
-      font-family: 'Cinzel', serif;
-    }
-
-    /* Wrapper untuk posisi */
-    .widget-container {
+    .info-box {
       position: fixed;
-      bottom: 50px; /* Posisi di bawah */
-      left: 50px;   /* Jarak dari kiri */
-      
-      /* Agar animasi smooth saat muncul */
-      animation: slideUp 1s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-    }
-
-    /* === BAR UTAMA === */
-    .music-bar {
-      width: 500px; /* LEBAR BAR (Ubah ini jika kurang panjang) */
-      height: 60px;
-      
+      top: 20px;
+      left: 20px;
       background: var(--bg-dark);
-      /* Texture Grid Halus */
-      background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-      background-size: 15px 15px;
-
-      /* Bentuk Miring & Border */
-      transform: skewX(-20deg);
-      border-left: 8px solid var(--samurai-orange);
-      border-right: 4px solid var(--samurai-orange);
-      
-      /* Shadow Glow */
-      box-shadow: 
-        0 0 15px rgba(0,0,0,0.5),
-        0 0 5px var(--glow);
-
+      border-left: 6px solid var(--samurai-orange);
+      padding: 20px 25px;
+      transform: skewX(-15deg);
+      width: 320px;
+      min-height: 80px; /* Lebih tinggi */
       display: flex;
       align-items: center;
-      padding: 0 25px;
-      position: relative;
-      overflow: hidden; /* Masking teks yang keluar */
+      box-shadow: 0 10px 20px rgba(0,0,0,0.5);
     }
 
-    /* Efek Kilatan Cahaya (Sheen) */
-    .music-bar::after {
-      content: '';
-      position: absolute;
-      top: 0; left: -150%;
-      width: 100%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-      transform: skewX(-10deg);
-      animation: sheen 6s infinite;
-      z-index: 10;
-    }
-
-    /* === KONTEN DALAM (Diluruskan kembali) === */
-    .content-inner {
-      transform: skewX(20deg);
-      display: flex;
-      align-items: center;
+    .info-content {
+      transform: skewX(15deg);
       width: 100%;
-      gap: 15px;
+      transition: all 0.5s ease-in-out;
     }
 
-    /* Ikon / Label Kiri */
-    .icon-box {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+    .fade-out { opacity: 0; transform: skewX(15deg) translateY(10px); }
+
+    .label {
+      font-size: 0.8rem;
       color: var(--samurai-orange);
-      border-right: 1px solid rgba(255, 137, 0, 0.3);
-      padding-right: 15px;
-      min-width: 50px;
+      letter-spacing: 2px;
+      font-weight: 800;
+      display: block;
+      margin-bottom: 8px;
     }
 
-    .icon-note {
-      font-size: 1.5rem;
-      filter: drop-shadow(0 0 5px var(--glow));
-      animation: beat 1s infinite;
-    }
-
-    .label-mini {
-      font-size: 0.6rem;
-      font-weight: 900;
-      letter-spacing: 1px;
-    }
-
-    /* Area Teks Lagu (Marquee) */
-    .track-container {
-      flex-grow: 1; /* Mengisi sisa ruang kosong */
-      overflow: hidden;
-      white-space: nowrap;
-      position: relative;
-      height: 30px;
-      display: flex;
-      align-items: center;
-    }
-
-    .track-text {
-      font-family: 'Share Tech Mono', monospace; /* Font digital */
-      font-size: 1.2rem;
+    .text {
+      font-family: 'Lato', sans-serif;
+      font-size: 1.1rem;
       color: var(--text-white);
-      text-transform: uppercase;
-      
-      /* Animasi Jalan (Marquee) */
-      display: inline-block;
-      padding-left: 100%; /* Mulai dari luar kanan */
-      animation: marquee 15s linear infinite; 
+      font-weight: 700;
     }
 
-    /* Visualizer (Kanan) */
-    .visualizer {
-      display: flex;
-      align-items: flex-end;
-      gap: 3px;
-      height: 25px;
-      padding-left: 10px;
+    .cmd {
+      background: rgba(255, 137, 0, 0.2);
+      padding: 2px 8px;
+      border: 1px dashed var(--samurai-orange);
+      color: #fff;
     }
-    
-    .bar {
-      width: 4px;
-      background: var(--samurai-orange);
-      box-shadow: 0 0 5px var(--glow);
-      animation: eq 1s ease-in-out infinite;
-    }
-    .bar:nth-child(1) { height: 40%; animation-duration: 0.6s; }
-    .bar:nth-child(2) { height: 80%; animation-duration: 0.9s; }
-    .bar:nth-child(3) { height: 30%; animation-duration: 0.7s; }
-    .bar:nth-child(4) { height: 60%; animation-duration: 0.5s; }
-
-    /* Progress Line (Hiasan Bawah) */
-    .progress-line {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      height: 3px;
-      background: var(--samurai-orange);
-      width: 0%;
-      animation: progressLoop 30s linear infinite;
-    }
-
-    /* === ANIMASI === */
-    @keyframes sheen { 0% { left: -150%; } 40%, 100% { left: 150%; } }
-    @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
-    @keyframes eq { 0%, 100% { height: 20%; } 50% { height: 100%; } }
-    @keyframes beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-    @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-    @keyframes progressLoop { 0% { width: 0%; } 100% { width: 100%; } }
-
   </style>
 </head>
 <body>
-
-  <div class="widget-container">
-    <div class="music-bar">
-      <div class="progress-line"></div>
-
-      <div class="content-inner">
-        
-        <div class="icon-box">
-          <div class="icon-note">🎵</div>
-          <span class="label-mini">PLAYING</span>
-        </div>
-
-        <div class="track-container">
-          <div class="track-text" id="songTitle">
-            /// WAITING FOR COMMAND... SEND /PLAY TO REQUEST SONG ///
-          </div>
-        </div>
-
-        <div class="visualizer">
-          <div class="bar"></div>
-          <div class="bar"></div>
-          <div class="bar"></div>
-          <div class="bar"></div>
-        </div>
-
-      </div>
+  <div class="info-box">
+    <div class="info-content" id="infoContent">
+      <span class="label">SYSTEM</span>
+      <div class="text">Initializing...</div>
     </div>
   </div>
 
   <script>
-    // === CARA MENGGANTI JUDUL LAGU ===
-    
-    // OPSI 1: Ganti Manual lewat sini
-    const songTitleElement = document.getElementById('songTitle');
-    // songTitleElement.innerText = "Avenged Sevenfold - Dear God";
-
-    // OPSI 2: Integrasi (Contoh Logic)
-    // Kamu bisa menyambungkan ini dengan API bot musikmu nanti.
-    // Fungsi ini bisa dipanggil dari luar untuk update teks:
-    function updateSong(artist, title) {
-        const text = `${artist} - ${title}   ///   `;
-        // Kita ulang teksnya 2x biar scrollingnya enak dilihat
-        songTitleElement.innerText = text + text;
+    const infoContent = document.getElementById('infoContent');
+    const messages = [
+      { label: "🎵 MUSIC COMMAND", text: 'Type <span class="cmd">/play judul-artist</span>' },
+      { label: "👤 ROBLOX PROFILE", text: "Link in Bio" },
+      { label: "🏯 JOIN CURRENT MAP", text: "Link in Bio" },
+      { label: "🛰️ DISCORD SERVER", text: "Join our Community" },
+      { label: "💎 SUPPORT STREAM", text: "Support via Saweria in Bio" }
+    ];
+    let idx = 0;
+    function update() {
+      infoContent.classList.add('fade-out');
+      setTimeout(() => {
+        infoContent.innerHTML = `<span class="label">${messages[idx].label}</span><div class="text">${messages[idx].text}</div>`;
+        infoContent.classList.remove('fade-out');
+        idx = (idx + 1) % messages.length;
+      }, 500);
     }
-
-    // Contoh simulasi update setelah 3 detik (Bisa dihapus)
-    // setTimeout(() => {
-    //    updateSong("SYSTEM", "Ready for Music Request...");
-    // }, 3000);
-
+    update();
+    setInterval(update, 6000);
   </script>
-
 </body>
 </html>
