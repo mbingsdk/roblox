@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Samurai Command Guide</title>
+  <title>Samurai HUD & Player</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,9 +12,9 @@
   <style>
     :root {
       --samurai-orange: #FF8900;
-      --bg-dark: rgba(10, 10, 10, 0.9);
+      --bg-dark: rgba(15, 15, 15, 0.95);
       --text-white: #ffffff;
-      --glow: rgba(255, 137, 0, 0.4);
+      --glow: rgba(255, 137, 0, 0.5);
     }
 
     body {
@@ -24,139 +24,302 @@
       overflow: hidden;
     }
 
-    .info-panel {
+    /* Wrapper Utama (Pojok Kiri Bawah/Tengah) */
+    .hud-container {
       position: fixed;
-      top: 150px; /* Diatur agar tidak bertabrakan dengan overlay atas */
+      top: 200px;
       left: 20px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      animation: slideIn 0.8s ease-out forwards;
+      gap: 12px; /* Jarak antara Info Box dan Music Player */
+      width: 320px;
     }
 
-    /* === Header Panel === */
-    .panel-header {
-      background: var(--samurai-orange);
-      color: #000;
-      padding: 5px 20px;
-      font-weight: 900;
-      font-size: 0.9rem;
-      letter-spacing: 2px;
-      transform: skewX(-15deg);
-      width: fit-content;
-      box-shadow: 0 0 15px var(--glow);
-    }
-
-    /* === Command Box (Music) === */
-    .command-box {
+    /* =========================================
+       1. INFO ROTATOR (ANIMASI BERGANTIAN)
+       ========================================= */
+    .info-box {
       background: var(--bg-dark);
-      border-left: 4px solid var(--samurai-orange);
-      padding: 12px 20px;
-      transform: skewX(-15deg);
-      border-bottom: 1px solid rgba(255,137,0,0.3);
-    }
-
-    .command-inner {
-      transform: skewX(15deg); /* Luruskan teks */
-    }
-
-    .music-title {
-      font-size: 0.65rem;
-      color: var(--samurai-orange);
-      display: block;
-      margin-bottom: 5px;
-    }
-
-    .command-syntax {
-      font-family: monospace;
-      background: rgba(255, 255, 255, 0.1);
-      padding: 4px 8px;
-      color: #fff;
-      font-size: 1rem;
-      border: 1px dashed var(--samurai-orange);
-    }
-
-    /* === List Link Section === */
-    .links-box {
-      background: rgba(20, 20, 20, 0.85);
+      border-left: 6px solid var(--samurai-orange);
       padding: 15px 20px;
       transform: skewX(-15deg);
-      border-left: 4px solid var(--samurai-orange);
-      backdrop-filter: blur(5px);
-    }
-
-    .links-inner {
-      transform: skewX(15deg);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .link-item {
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+      position: relative;
+      overflow: hidden;
+      min-height: 50px;
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-family: 'Lato', sans-serif;
-      font-size: 0.9rem;
-      color: var(--text-white);
-      transition: 0.3s;
     }
 
-    .link-item b {
+    /* Garis dekorasi atas */
+    .info-box::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 2px;
+      background: linear-gradient(90deg, var(--samurai-orange), transparent);
+    }
+
+    /* Container konten agar teks tegak */
+    .info-content {
+      transform: skewX(15deg);
+      width: 100%;
+      opacity: 1;
+      transition: opacity 0.5s ease-in-out, transform 0.5s ease;
+    }
+
+    /* Animasi Fade Out/In */
+    .fade-out {
+      opacity: 0;
+      transform: skewX(15deg) translateY(10px);
+    }
+
+    .info-label {
+      font-size: 0.75rem;
       color: var(--samurai-orange);
-      font-family: 'Cinzel', serif;
-      font-size: 0.8rem;
+      letter-spacing: 2px;
+      font-weight: 800;
+      display: block;
+      margin-bottom: 4px;
     }
 
-    .bio-footer {
+    .info-text {
+      font-family: 'Lato', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-white);
+    }
+
+    .highlight-cmd {
+      background: rgba(255, 137, 0, 0.2);
+      padding: 2px 6px;
+      border: 1px dashed var(--samurai-orange);
+      font-family: monospace;
+    }
+
+    /* =========================================
+       2. MUSIC PLAYER WIDGET (STATIS)
+       ========================================= */
+    .player-box {
+      background: rgba(20, 20, 20, 0.9);
+      padding: 15px 20px;
+      transform: skewX(-15deg);
+      border-right: 4px solid var(--samurai-orange);
+      position: relative;
+      /* Pattern Grid Halus */
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 10px 10px;
+    }
+
+    .player-inner {
+      transform: skewX(15deg);
+    }
+
+    .playlist-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .playlist-title {
       font-size: 0.7rem;
       color: #888;
-      margin-top: 10px;
-      text-align: center;
-      font-style: italic;
+      letter-spacing: 1px;
     }
 
-    /* === Animasi === */
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateX(-50px); }
-      to { opacity: 1; transform: translateX(0); }
+    .live-indicator {
+      font-size: 0.6rem;
+      color: var(--samurai-orange);
+      border: 1px solid var(--samurai-orange);
+      padding: 1px 4px;
+      animation: blink 2s infinite;
     }
 
-    /* Efek Berdenyut pada Command */
-    .pulse {
-      animation: pulseAnim 2s infinite;
+    .track-name {
+      font-size: 1.1rem;
+      color: var(--text-white);
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 10px;
+      text-shadow: 0 0 5px var(--glow);
     }
 
-    @keyframes pulseAnim {
-      0% { text-shadow: 0 0 0px var(--samurai-orange); }
-      50% { text-shadow: 0 0 10px var(--samurai-orange); }
-      100% { text-shadow: 0 0 0px var(--samurai-orange); }
+    /* Player Controls */
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 8px;
     }
+
+    .btn {
+      cursor: pointer;
+      color: #aaa;
+      font-size: 1.2rem;
+      transition: 0.3s;
+    }
+    .btn:hover { color: #fff; }
+    .btn-play { 
+      color: var(--samurai-orange); 
+      font-size: 1.5rem; 
+      filter: drop-shadow(0 0 5px var(--glow));
+    }
+
+    /* Progress Bar */
+    .progress-container {
+      width: 100%;
+      height: 4px;
+      background: #333;
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--samurai-orange);
+      width: 0%;
+      position: relative;
+      animation: musicProgress 60s linear infinite; /* Simulasi lagu 1 menit loop */
+    }
+
+    /* Efek Kilatan di ujung progress bar */
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      right: 0; top: 0; bottom: 0;
+      width: 5px;
+      background: #fff;
+      box-shadow: 0 0 10px #fff;
+    }
+
+    /* Visualizer Bars (Hiasan bergerak) */
+    .visualizer {
+      display: flex;
+      gap: 3px;
+      height: 15px;
+      align-items: flex-end;
+    }
+    .bar {
+      width: 4px;
+      background: var(--samurai-orange);
+      animation: equalizer 1s ease-in-out infinite;
+    }
+    .bar:nth-child(1) { animation-duration: 0.8s; height: 40%; }
+    .bar:nth-child(2) { animation-duration: 1.2s; height: 80%; }
+    .bar:nth-child(3) { animation-duration: 0.9s; height: 50%; }
+    .bar:nth-child(4) { animation-duration: 1.5s; height: 70%; }
+
+    /* Keyframes */
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    @keyframes musicProgress { 0% { width: 0%; } 100% { width: 100%; } }
+    @keyframes equalizer { 0%, 100% { height: 20%; } 50% { height: 100%; } }
+
   </style>
 </head>
 <body>
 
-  <div class="info-panel">
-    <div class="panel-header">STREAM COMMANDS</div>
-
-    <div class="command-box">
-      <div class="command-inner">
-        <span class="music-title">🎵 REQUEST MUSIC</span>
-        <span class="command-syntax pulse">/play judul-artist</span>
+  <div class="hud-container">
+    
+    <div class="info-box">
+      <div class="info-content" id="infoContent">
+        <span class="info-label">SYSTEM</span>
+        <div class="info-text">Initializing...</div>
       </div>
     </div>
 
-    <div class="links-box">
-      <div class="links-inner">
-        <div class="link-item"><b>👤</b> Profile Roblox</div>
-        <div class="link-item"><b>🏯</b> Join Current Map</div>
-        <div class="link-item"><b>🛰️</b> Join Discord</div>
-        <div class="link-item"><b>💎</b> Support Donation</div>
+    <div class="player-box">
+      <div class="player-inner">
         
-        <div class="bio-footer">Check link in bio for access!</div>
+        <div class="playlist-header">
+          <span class="playlist-title">STREAM PLAYLIST</span>
+          <span class="live-indicator">LIVE</span>
+        </div>
+
+        <div class="track-name">Waiting for Request...</div>
+
+        <div class="controls">
+          <div class="btn">⏮</div>
+          <div class="btn btn-play">▶</div>
+          <div class="btn">⏭</div>
+          
+          <div class="visualizer" style="margin-left: auto;">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+          </div>
+        </div>
+
+        <div class="progress-container">
+          <div class="progress-fill"></div>
+        </div>
+
       </div>
     </div>
+
   </div>
 
+  <script>
+    const infoContent = document.getElementById('infoContent');
+
+    // DAFTAR PESAN YANG AKAN MUNCUL BERGANTIAN
+    const messages = [
+      {
+        label: "🎵 MUSIC COMMAND",
+        html: `Type <span class="highlight-cmd">/play title-artist</span>`
+      },
+      {
+        label: "👤 ROBLOX PROFILE",
+        html: "Check Link in Bio"
+      },
+      {
+        label: "🏯 JOIN CURRENT MAP",
+        html: "Join via Link in Bio"
+      },
+      {
+        label: "🛰️ DISCORD SERVER",
+        html: "Join our Community (Link Bio)"
+      },
+      {
+        label: "💎 SUPPORT STREAM",
+        html: "Donation Link in Bio"
+      }
+    ];
+
+    let currentIndex = 0;
+
+    function updateInfo() {
+      // 1. Animasi Keluar
+      infoContent.classList.add('fade-out');
+
+      // 2. Ganti Teks setelah animasi keluar selesai (0.5 detik)
+      setTimeout(() => {
+        const msg = messages[currentIndex];
+        
+        infoContent.innerHTML = `
+          <span class="info-label">${msg.label}</span>
+          <div class="info-text">${msg.html}</div>
+        `;
+
+        // 3. Animasi Masuk
+        infoContent.classList.remove('fade-out');
+
+        // Pindah ke pesan berikutnya
+        currentIndex = (currentIndex + 1) % messages.length;
+      }, 500);
+    }
+
+    // Jalankan pertama kali
+    updateInfo();
+
+    // Ganti pesan setiap 5 detik
+    setInterval(updateInfo, 5000);
+
+  </script>
 </body>
 </html>
