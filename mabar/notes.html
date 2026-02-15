@@ -3,323 +3,227 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Samurai HUD & Player</title>
+  <title>Samurai Music Wide</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
   <style>
     :root {
       --samurai-orange: #FF8900;
-      --bg-dark: rgba(15, 15, 15, 0.95);
+      --bg-dark: rgba(12, 12, 12, 0.95);
       --text-white: #ffffff;
-      --glow: rgba(255, 137, 0, 0.5);
+      --glow: rgba(255, 137, 0, 0.6);
     }
 
     body {
       margin: 0;
       background: transparent;
+      overflow: hidden;
       font-family: 'Cinzel', serif;
-      overflow: hidden;
     }
 
-    /* Wrapper Utama (Pojok Kiri Bawah/Tengah) */
-    .hud-container {
+    /* Wrapper untuk posisi */
+    .widget-container {
       position: fixed;
-      top: 200px;
-      left: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px; /* Jarak antara Info Box dan Music Player */
-      width: 320px;
+      bottom: 50px; /* Posisi di bawah */
+      left: 50px;   /* Jarak dari kiri */
+      
+      /* Agar animasi smooth saat muncul */
+      animation: slideUp 1s cubic-bezier(0.23, 1, 0.32, 1) forwards;
     }
 
-    /* =========================================
-       1. INFO ROTATOR (ANIMASI BERGANTIAN)
-       ========================================= */
-    .info-box {
+    /* === BAR UTAMA === */
+    .music-bar {
+      width: 500px; /* LEBAR BAR (Ubah ini jika kurang panjang) */
+      height: 60px;
+      
       background: var(--bg-dark);
-      border-left: 6px solid var(--samurai-orange);
-      padding: 15px 20px;
-      transform: skewX(-15deg);
-      box-shadow: 0 0 15px rgba(0,0,0,0.5);
-      position: relative;
-      overflow: hidden;
-      min-height: 50px;
-      display: flex;
-      align-items: center;
-    }
-
-    /* Garis dekorasi atas */
-    .info-box::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 2px;
-      background: linear-gradient(90deg, var(--samurai-orange), transparent);
-    }
-
-    /* Container konten agar teks tegak */
-    .info-content {
-      transform: skewX(15deg);
-      width: 100%;
-      opacity: 1;
-      transition: opacity 0.5s ease-in-out, transform 0.5s ease;
-    }
-
-    /* Animasi Fade Out/In */
-    .fade-out {
-      opacity: 0;
-      transform: skewX(15deg) translateY(10px);
-    }
-
-    .info-label {
-      font-size: 0.75rem;
-      color: var(--samurai-orange);
-      letter-spacing: 2px;
-      font-weight: 800;
-      display: block;
-      margin-bottom: 4px;
-    }
-
-    .info-text {
-      font-family: 'Lato', sans-serif;
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--text-white);
-    }
-
-    .highlight-cmd {
-      background: rgba(255, 137, 0, 0.2);
-      padding: 2px 6px;
-      border: 1px dashed var(--samurai-orange);
-      font-family: monospace;
-    }
-
-    /* =========================================
-       2. MUSIC PLAYER WIDGET (STATIS)
-       ========================================= */
-    .player-box {
-      background: rgba(20, 20, 20, 0.9);
-      padding: 15px 20px;
-      transform: skewX(-15deg);
-      border-right: 4px solid var(--samurai-orange);
-      position: relative;
-      /* Pattern Grid Halus */
+      /* Texture Grid Halus */
       background-image: 
         linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-      background-size: 10px 10px;
-    }
+      background-size: 15px 15px;
 
-    .player-inner {
-      transform: skewX(15deg);
-    }
+      /* Bentuk Miring & Border */
+      transform: skewX(-20deg);
+      border-left: 8px solid var(--samurai-orange);
+      border-right: 4px solid var(--samurai-orange);
+      
+      /* Shadow Glow */
+      box-shadow: 
+        0 0 15px rgba(0,0,0,0.5),
+        0 0 5px var(--glow);
 
-    .playlist-header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px;
+      padding: 0 25px;
+      position: relative;
+      overflow: hidden; /* Masking teks yang keluar */
     }
 
-    .playlist-title {
-      font-size: 0.7rem;
-      color: #888;
+    /* Efek Kilatan Cahaya (Sheen) */
+    .music-bar::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -150%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transform: skewX(-10deg);
+      animation: sheen 6s infinite;
+      z-index: 10;
+    }
+
+    /* === KONTEN DALAM (Diluruskan kembali) === */
+    .content-inner {
+      transform: skewX(20deg);
+      display: flex;
+      align-items: center;
+      width: 100%;
+      gap: 15px;
+    }
+
+    /* Ikon / Label Kiri */
+    .icon-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--samurai-orange);
+      border-right: 1px solid rgba(255, 137, 0, 0.3);
+      padding-right: 15px;
+      min-width: 50px;
+    }
+
+    .icon-note {
+      font-size: 1.5rem;
+      filter: drop-shadow(0 0 5px var(--glow));
+      animation: beat 1s infinite;
+    }
+
+    .label-mini {
+      font-size: 0.6rem;
+      font-weight: 900;
       letter-spacing: 1px;
     }
 
-    .live-indicator {
-      font-size: 0.6rem;
-      color: var(--samurai-orange);
-      border: 1px solid var(--samurai-orange);
-      padding: 1px 4px;
-      animation: blink 2s infinite;
-    }
-
-    .track-name {
-      font-size: 1.1rem;
-      color: var(--text-white);
-      font-weight: 700;
-      white-space: nowrap;
+    /* Area Teks Lagu (Marquee) */
+    .track-container {
+      flex-grow: 1; /* Mengisi sisa ruang kosong */
       overflow: hidden;
-      text-overflow: ellipsis;
-      margin-bottom: 10px;
-      text-shadow: 0 0 5px var(--glow);
-    }
-
-    /* Player Controls */
-    .controls {
+      white-space: nowrap;
+      position: relative;
+      height: 30px;
       display: flex;
       align-items: center;
-      gap: 15px;
-      margin-bottom: 8px;
     }
 
-    .btn {
-      cursor: pointer;
-      color: #aaa;
+    .track-text {
+      font-family: 'Share Tech Mono', monospace; /* Font digital */
       font-size: 1.2rem;
-      transition: 0.3s;
-    }
-    .btn:hover { color: #fff; }
-    .btn-play { 
-      color: var(--samurai-orange); 
-      font-size: 1.5rem; 
-      filter: drop-shadow(0 0 5px var(--glow));
-    }
-
-    /* Progress Bar */
-    .progress-container {
-      width: 100%;
-      height: 4px;
-      background: #333;
-      border-radius: 2px;
-      overflow: hidden;
-      position: relative;
+      color: var(--text-white);
+      text-transform: uppercase;
+      
+      /* Animasi Jalan (Marquee) */
+      display: inline-block;
+      padding-left: 100%; /* Mulai dari luar kanan */
+      animation: marquee 15s linear infinite; 
     }
 
-    .progress-fill {
-      height: 100%;
-      background: var(--samurai-orange);
-      width: 0%;
-      position: relative;
-      animation: musicProgress 60s linear infinite; /* Simulasi lagu 1 menit loop */
-    }
-
-    /* Efek Kilatan di ujung progress bar */
-    .progress-fill::after {
-      content: '';
-      position: absolute;
-      right: 0; top: 0; bottom: 0;
-      width: 5px;
-      background: #fff;
-      box-shadow: 0 0 10px #fff;
-    }
-
-    /* Visualizer Bars (Hiasan bergerak) */
+    /* Visualizer (Kanan) */
     .visualizer {
       display: flex;
-      gap: 3px;
-      height: 15px;
       align-items: flex-end;
+      gap: 3px;
+      height: 25px;
+      padding-left: 10px;
     }
+    
     .bar {
       width: 4px;
       background: var(--samurai-orange);
-      animation: equalizer 1s ease-in-out infinite;
+      box-shadow: 0 0 5px var(--glow);
+      animation: eq 1s ease-in-out infinite;
     }
-    .bar:nth-child(1) { animation-duration: 0.8s; height: 40%; }
-    .bar:nth-child(2) { animation-duration: 1.2s; height: 80%; }
-    .bar:nth-child(3) { animation-duration: 0.9s; height: 50%; }
-    .bar:nth-child(4) { animation-duration: 1.5s; height: 70%; }
+    .bar:nth-child(1) { height: 40%; animation-duration: 0.6s; }
+    .bar:nth-child(2) { height: 80%; animation-duration: 0.9s; }
+    .bar:nth-child(3) { height: 30%; animation-duration: 0.7s; }
+    .bar:nth-child(4) { height: 60%; animation-duration: 0.5s; }
 
-    /* Keyframes */
-    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-    @keyframes musicProgress { 0% { width: 0%; } 100% { width: 100%; } }
-    @keyframes equalizer { 0%, 100% { height: 20%; } 50% { height: 100%; } }
+    /* Progress Line (Hiasan Bawah) */
+    .progress-line {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      background: var(--samurai-orange);
+      width: 0%;
+      animation: progressLoop 30s linear infinite;
+    }
+
+    /* === ANIMASI === */
+    @keyframes sheen { 0% { left: -150%; } 40%, 100% { left: 150%; } }
+    @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
+    @keyframes eq { 0%, 100% { height: 20%; } 50% { height: 100%; } }
+    @keyframes beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+    @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes progressLoop { 0% { width: 0%; } 100% { width: 100%; } }
 
   </style>
 </head>
 <body>
 
-  <div class="hud-container">
-    
-    <div class="info-box">
-      <div class="info-content" id="infoContent">
-        <span class="info-label">SYSTEM</span>
-        <div class="info-text">Initializing...</div>
-      </div>
-    </div>
+  <div class="widget-container">
+    <div class="music-bar">
+      <div class="progress-line"></div>
 
-    <div class="player-box">
-      <div class="player-inner">
+      <div class="content-inner">
         
-        <div class="playlist-header">
-          <span class="playlist-title">STREAM PLAYLIST</span>
-          <span class="live-indicator">LIVE</span>
+        <div class="icon-box">
+          <div class="icon-note">🎵</div>
+          <span class="label-mini">PLAYING</span>
         </div>
 
-        <div class="track-name">Waiting for Request...</div>
-
-        <div class="controls">
-          <div class="btn">⏮</div>
-          <div class="btn btn-play">▶</div>
-          <div class="btn">⏭</div>
-          
-          <div class="visualizer" style="margin-left: auto;">
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
+        <div class="track-container">
+          <div class="track-text" id="songTitle">
+            /// WAITING FOR COMMAND... SEND /PLAY TO REQUEST SONG ///
           </div>
         </div>
 
-        <div class="progress-container">
-          <div class="progress-fill"></div>
+        <div class="visualizer">
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
         </div>
 
       </div>
     </div>
-
   </div>
 
   <script>
-    const infoContent = document.getElementById('infoContent');
+    // === CARA MENGGANTI JUDUL LAGU ===
+    
+    // OPSI 1: Ganti Manual lewat sini
+    const songTitleElement = document.getElementById('songTitle');
+    // songTitleElement.innerText = "Avenged Sevenfold - Dear God";
 
-    // DAFTAR PESAN YANG AKAN MUNCUL BERGANTIAN
-    const messages = [
-      {
-        label: "🎵 MUSIC COMMAND",
-        html: `Type <span class="highlight-cmd">/play title-artist</span>`
-      },
-      {
-        label: "👤 ROBLOX PROFILE",
-        html: "Check Link in Bio"
-      },
-      {
-        label: "🏯 JOIN CURRENT MAP",
-        html: "Join via Link in Bio"
-      },
-      {
-        label: "🛰️ DISCORD SERVER",
-        html: "Join our Community (Link Bio)"
-      },
-      {
-        label: "💎 SUPPORT STREAM",
-        html: "Donation Link in Bio"
-      }
-    ];
-
-    let currentIndex = 0;
-
-    function updateInfo() {
-      // 1. Animasi Keluar
-      infoContent.classList.add('fade-out');
-
-      // 2. Ganti Teks setelah animasi keluar selesai (0.5 detik)
-      setTimeout(() => {
-        const msg = messages[currentIndex];
-        
-        infoContent.innerHTML = `
-          <span class="info-label">${msg.label}</span>
-          <div class="info-text">${msg.html}</div>
-        `;
-
-        // 3. Animasi Masuk
-        infoContent.classList.remove('fade-out');
-
-        // Pindah ke pesan berikutnya
-        currentIndex = (currentIndex + 1) % messages.length;
-      }, 500);
+    // OPSI 2: Integrasi (Contoh Logic)
+    // Kamu bisa menyambungkan ini dengan API bot musikmu nanti.
+    // Fungsi ini bisa dipanggil dari luar untuk update teks:
+    function updateSong(artist, title) {
+        const text = `${artist} - ${title}   ///   `;
+        // Kita ulang teksnya 2x biar scrollingnya enak dilihat
+        songTitleElement.innerText = text + text;
     }
 
-    // Jalankan pertama kali
-    updateInfo();
-
-    // Ganti pesan setiap 5 detik
-    setInterval(updateInfo, 5000);
+    // Contoh simulasi update setelah 3 detik (Bisa dihapus)
+    // setTimeout(() => {
+    //    updateSong("SYSTEM", "Ready for Music Request...");
+    // }, 3000);
 
   </script>
+
 </body>
 </html>
