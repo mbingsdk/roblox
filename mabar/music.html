@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Samurai Music Widget</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --samurai-orange: #FF8900;
+      --bg-dark: rgba(15, 15, 15, 0.95);
+    }
+    body { margin: 0; background: transparent; font-family: 'Cinzel', serif; overflow: hidden; }
+
+    .player-container {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 320px;
+      /* Tinggi total widget, bagian atas akan kosong untuk playlist kamu */
+      height: 450px; 
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end; /* Memaksa player ke bawah */
+    }
+
+    /* Area kosong ini tempat kamu naro playlist sendiri di OBS */
+    .playlist-placeholder {
+      height: 300px; 
+      width: 100%;
+      /* background: rgba(255,255,255,0.05); /* Aktifkan ini untuk liat areanya saat testing */
+    }
+
+    .player-ui {
+      background: var(--bg-dark);
+      padding: 15px 20px;
+      transform: skewX(-15deg);
+      border-right: 5px solid var(--samurai-orange);
+      border-top: 2px solid rgba(255, 137, 0, 0.3);
+      box-shadow: 0 0 20px rgba(0,0,0,0.6);
+    }
+
+    .inner { transform: skewX(15deg); }
+
+    .now-playing {
+      font-size: 0.65rem;
+      color: var(--samurai-orange);
+      letter-spacing: 2px;
+      margin-bottom: 5px;
+    }
+
+    .song-title {
+      font-size: 1.1rem;
+      color: #fff;
+      margin-bottom: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 10px;
+    }
+
+    .btn { color: #888; font-size: 1.2rem; }
+    .btn-play { color: var(--samurai-orange); font-size: 1.6rem; }
+
+    .visualizer {
+      margin-left: auto;
+      display: flex;
+      gap: 3px;
+      height: 15px;
+    }
+    .bar {
+      width: 3px;
+      background: var(--samurai-orange);
+      animation: eq 1s ease-in-out infinite;
+    }
+    @keyframes eq { 0%, 100% { height: 30%; } 50% { height: 100%; } }
+
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: #333;
+    }
+    .fill {
+      height: 100%;
+      background: var(--samurai-orange);
+      width: 40%; /* Simulasi progres */
+      box-shadow: 0 0 8px var(--samurai-orange);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="player-container">
+    <div class="playlist-placeholder"></div>
+
+    <div class="player-ui">
+      <div class="inner">
+        <div class="now-playing">NOW PLAYING</div>
+        <div class="song-title">Awaiting Request...</div>
+        
+        <div class="controls">
+          <div class="btn">⏮</div>
+          <div class="btn btn-play">▶</div>
+          <div class="btn">⏭</div>
+          <div class="visualizer">
+            <div class="bar" style="animation-delay: 0.1s"></div>
+            <div class="bar" style="animation-delay: 0.3s"></div>
+            <div class="bar" style="animation-delay: 0.2s"></div>
+          </div>
+        </div>
+
+        <div class="progress-bar">
+          <div class="fill"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
