@@ -142,7 +142,8 @@
     const amountTag = document.getElementById("amountTag");
     const mainBox = document.getElementById("mainBox");
     
-    const API_URL = "https://backend.saweria.co/widgets/recent";
+    // const API_URL = "https://backend.saweria.co/widgets/recent";
+    const API_URL = "https://backend.saweria.co/widgets/leaderboard/month";
     const urlParams = new URLSearchParams(window.location.search);
     const STREAM_KEY = urlParams.get('streamKey');
 
@@ -176,7 +177,7 @@
       const message = item.message ? `"${item.message}"` : `"Makasih..."`;
 
       donationArea.innerHTML = `
-        <span class="donator-label">LATEST TRIBUTE</span>
+        <span class="donator-label">SUPPORT BULAN INI</span>
         <div class="donator-name">${name}</div>
         ${message ? `<div class="donator-msg">${message}</div>` : ''}
       `;
