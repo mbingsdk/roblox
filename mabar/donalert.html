@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Samurai Alert - Live from GitHub</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@800;900&family=Lato:ital,wght@1,400;1,700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --samurai-orange: #FF8900;
+      --orange-glow: rgba(255, 137, 0, 0.8);
+      --bg-dark: rgba(10, 10, 10, 0.95);
+      --money-green: #7EF655;
+    }
+
+    body {
+      margin: 0; background: transparent; font-family: 'Cinzel', serif;
+      display: flex; justify-content: center; align-items: center; height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Container Alert */
+    .alert-box {
+      position: relative; background: var(--bg-dark); padding: 30px 50px;
+      min-width: 450px; text-align: center;
+      transform: skewX(-15deg) scaleY(0); 
+      border-top: 4px solid var(--samurai-orange);
+      border-bottom: 4px solid var(--samurai-orange);
+      box-shadow: 0 0 50px var(--orange-glow);
+      opacity: 0;
+      background-image: linear-gradient(45deg, rgba(255,137,0,0.05) 25%, transparent 25%, transparent 50%, rgba(255,137,0,0.05) 50%, rgba(255,137,0,0.05) 75%, transparent 75%, transparent);
+      background-size: 20px 20px;
+      transition: all 0.5s ease;
+    }
+
+    .content-inner { transform: skewX(15deg); display: flex; flex-direction: column; align-items: center; }
+
+    .alert-title {
+      font-size: 1.2rem; color: var(--samurai-orange); letter-spacing: 5px;
+      margin-bottom: 10px; text-shadow: 0 0 10px var(--orange-glow);
+    }
+
+    .donator-name {
+      font-size: 3rem; color: #fff; font-weight: 900;
+      text-transform: uppercase; margin: -5px 0;
+      text-shadow: 4px 4px 0px rgba(0,0,0,0.8);
+    }
+
+    .donator-amount {
+      font-size: 2.2rem; color: var(--money-green); font-weight: 900;
+      margin-bottom: 15px; text-shadow: 0 0 20px rgba(126, 246, 85, 0.6);
+    }
+
+    .donator-msg {
+      font-family: 'Lato', sans-serif; font-size: 1.2rem; color: #ddd;
+      font-style: italic; background: rgba(0,0,0,0.5); padding: 10px 20px;
+      border-left: 3px solid var(--samurai-orange); max-width: 85%;
+    }
+
+    /* === Animasi === */
+    .show-alert { animation: slashOpen 0.5s forwards, shake 0.4s 0.5s, slashClose 0.4s 6s forwards; }
+
+    @keyframes slashOpen {
+      0% { transform: skewX(-15deg) scaleY(0); opacity: 0; }
+      50% { transform: skewX(-15deg) scaleY(0.1) scaleX(1.2); opacity: 1; background: #fff; }
+      100% { transform: skewX(-15deg) scaleY(1) scaleX(1); opacity: 1; }
+    }
+    @keyframes slashClose {
+      0% { transform: skewX(-15deg) scaleY(1); opacity: 1; }
+      100% { transform: skewX(-15deg) scaleY(0); opacity: 0; }
+    }
+    @keyframes shake {
+      0%, 100% { transform: skewX(-15deg) translateX(0); }
+      25% { transform: skewX(-15deg) translateX(-10px); }
+      75% { transform: skewX(-15deg) translateX(10px); }
+    }
+  </style>
+</head>
+<body>
+
+  <audio id="alertSound" src="https://assets.mixkit.co/active_storage/sfx/2144/2144-preview.mp3" preload="auto"></audio>
+
+  <div class="alert-box" id="alertBox">
+    <div class="content-inner">
+      <div class="alert-title">🔥 BOUNTY CLAIMED 🔥</div>
+      <div class="donator-name" id="dName">---</div>
+      <div class="donator-amount" id="dAmount">---</div>
+      <div class="donator-msg" id="dMsg">---</div>
+    </div>
+  </div>
+
+  <script>
+    const alertBox = document.getElementById('alertBox');
+    const alertSound = document.getElementById('alertSound');
+    const dName = document.getElementById('dName');
+    const dAmount = document.getElementById('dAmount');
+    const dMsg = document.getElementById('dMsg');
+
+    // VOLUME 50%
+    alertSound.volume = 0.5;
+
+    const formatter = new Intl.NumberFormat('id-ID', {
+      style: 'currency', currency: 'IDR', minimumFractionDigits: 0
+    });
+
+    let queue = [];
+    let isPlaying = false;
+
+    function processQueue() {
+      if (queue.length === 0 || isPlaying) return;
+      isPlaying = true;
+      const data = queue.shift();
+
+      dName.textContent = data.donator_name;
+      dAmount.textContent = formatter.format(data.amount);
+      dMsg.textContent = data.message ? `"${data.message}"` : "";
+      dMsg.style.display = data.message ? "block" : "none";
+
+      alertSound.currentTime = 0;
+      alertSound.play().catch(e => console.log("Waiting for user interaction or OBS focus"));
+
+      alertBox.classList.remove('show-alert');
+      void alertBox.offsetWidth;
+      alertBox.classList.add('show-alert');
+
+      setTimeout(() => {
+        isPlaying = false;
+        processQueue();
+      }, 7000); 
+    }
+
+    // Koneksi Real-time
+    const urlParams = new URLSearchParams(window.location.search);
+    const STREAM_KEY = urlParams.get('streamKey');
+
+    if (STREAM_KEY) {
+      const sse = new EventSource(`https://backend.saweria.co/stream?streamKey=${STREAM_KEY}`);
+      sse.addEventListener('donations', (event) => {
+        const donations = JSON.parse(event.data);
+        donations.forEach(don => queue.push(don));
+        processQueue();
+      });
+    }
+
+    // TEST ALERT (Muncul saat pertama kali buka)
+    setTimeout(() => {
+        queue.push({donator_name: "GitHub Deploy", amount: 50000, message: "Overlay successfully loaded from GitHub!"});
+        processQueue();
+    }, 2000);
+  </script>
+</body>
+</html>
