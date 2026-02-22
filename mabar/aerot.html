@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Samurai Overlay Ultimate</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <style>
+    :root {
+      --red-main: #e8235e;
+      --red-glow: rgba(232, 35, 94, 0.55);
+      --bg-dark: rgba(8, 8, 10, 0.92);
+      --text-white: #F4F4F4;
+    }
+    
+    body {
+      margin: 0;
+      background: transparent;
+      font-family: 'Cinzel', serif;
+      overflow: hidden;
+    }
+    
+    /* Container utama */
+    .samurai-box {
+      position: fixed;
+      top: 25px;
+      right: 25px;
+    
+      display: flex;
+      align-items: center;
+      padding: 12px 28px;
+    
+      background-color: var(--bg-dark);
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+      background-size: 22px 22px;
+    
+      transform: skewX(-14deg);
+    
+      /* Border lebih agresif */
+      border-left: 7px solid var(--red-main);
+      border-right: 1.5px solid rgba(232, 35, 94, 0.6);
+    
+      box-shadow:
+        0 0 18px var(--red-glow),
+        inset 0 0 35px rgba(0,0,0,0.85);
+    
+      overflow: hidden;
+      transition: all 0.35s ease;
+    }
+    
+    /* Shimmer Pedang */
+    .samurai-box::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -160%;
+      width: 120%;
+      height: 100%;
+      background: linear-gradient(
+        100deg,
+        transparent 20%,
+        rgba(255,255,255,0.45),
+        transparent 80%
+      );
+      transform: skewX(-20deg);
+      animation: sheen 5s infinite;
+    }
+    
+    /* Konten diluruskan */
+    .content {
+      transform: skewX(14deg);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      line-height: 1.15;
+    }
+    
+    /* Label kecil */
+    .label-mini {
+      font-size: 0.7rem;
+      color: var(--red-main);
+      font-weight: 800;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+      text-shadow: 0 0 6px var(--red-glow);
+    }
+    
+    /* Teks utama */
+    .value-main {
+      font-size: 1.35rem;
+      color: var(--text-white);
+      font-weight: 600;
+      white-space: nowrap;
+      text-shadow:
+        2px 2px 0 #000,
+        0 0 6px rgba(232, 35, 94, 0.25);
+    }
+    
+    /* Animasi Flip */
+    .flip-in {
+      animation: flipIn 0.65s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+    
+    @keyframes flipIn {
+      0% {
+        opacity: 0;
+        transform: rotateX(-95deg) translateY(6px);
+      }
+      100% {
+        opacity: 1;
+        transform: rotateX(0deg) translateY(0);
+      }
+    }
+    
+    /* Animasi Kilatan */
+    @keyframes sheen {
+      0% { left: -160%; }
+      18% { left: 160%; }
+      100% { left: 160%; }
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="samurai-box">
+    <div class="content" id="displayArea">
+      <div class="label-mini">SYSTEM</div>
+      <div class="value-main">Initializing...</div>
+    </div>
+  </div>
+
+  <script>
+    const displayArea = document.getElementById("displayArea");
+
+    let showMap = true;
+    let lastMap = "Unknown Realm";
+    let lastUser = "Unknown Ronin";
+    let refreshTimer;
+
+    const API_URL = "https://discord.mbingsdk.my.id/api/roblox/current-room";
+
+    function getQueryId() {
+      return new URLSearchParams(window.location.search).get("id");
+    }
+
+    // Fungsi Render dengan Animasi Flip
+    function render(label, value, icon) {
+      // Hapus kelas animasi sebentar untuk reset
+      displayArea.classList.remove("flip-in");
+      
+      // Force Reflow (trik CSS agar animasi bisa restart)
+      void displayArea.offsetWidth; 
+      
+      // Update HTML
+      displayArea.innerHTML = `
+        <div class="label-mini">${icon} ${label}</div>
+        <div class="value-main">${value}</div>
+      `;
+      
+      // Pasang animasi lagi
+      displayArea.classList.add("flip-in");
+    }
+
+    async function fetchData(auto = true) {
+      let url = API_URL;
+      const id = getQueryId();
+      if (id) url += `?id=${id}`;
+
+      try {
+        const res = await axios.get(url);
+        lastMap = res.data?.lastLocation || "Unknown Realm";
+        lastUser = res.data?.username || "Unknown Ronin";
+      } catch (err) {
+        console.error(err);
+        lastMap = "⚠️ Disconnected";
+        lastUser = "⚠️ No Data";
+      }
+
+      if (auto) {
+        clearInterval(refreshTimer);
+        refreshTimer = setInterval(fetchData, 20000);
+      }
+    }
+
+    function toggleDisplay() {
+      if (showMap) {
+        // Label MAP
+        render("CURRENT LOCATION", lastMap, "🏯");
+      } else {
+        // Label USER
+        render("USERNAME", lastUser, "⚔️");
+      }
+      showMap = !showMap;
+    }
+
+    // Mulai
+    fetchData();
+    // Delay sedikit agar data terambil dulu sebelum render pertama
+    setTimeout(toggleDisplay, 500); 
+    setInterval(toggleDisplay, 8000); // Ganti tiap 8 detik
+  </script>
+</body>
+</html>
