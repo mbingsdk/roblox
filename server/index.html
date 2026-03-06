@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Roblox Server Scanner</title>
+
+<style>
+
+body{
+background:#0b0b0b;
+color:white;
+font-family:Segoe UI,Arial;
+margin:0;
+padding:20px;
+}
+
+header{
+display:flex;
+gap:10px;
+margin-bottom:20px;
+}
+
+input{
+flex:1;
+background:#111;
+border:1px solid #333;
+color:white;
+padding:8px;
+}
+
+button{
+background:#ffd400;
+border:none;
+padding:8px 14px;
+font-weight:bold;
+cursor:pointer;
+}
+
+button:hover{
+background:#ffe866;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+gap:12px;
+}
+
+.card{
+background:#101010;
+border:1px solid #333;
+border-radius:10px;
+padding:12px;
+box-shadow:0 0 8px rgba(0,0,0,.6);
+}
+
+.title{
+font-weight:bold;
+margin-bottom:6px;
+}
+
+.bar{
+height:8px;
+background:#1a1a1a;
+border:1px solid #333;
+margin-bottom:8px;
+}
+
+.chunk{
+height:100%;
+}
+
+.ping-dot{
+font-size:14px;
+margin-right:4px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<input id="place" placeholder="Place ID" value="14963184269">
+<button onclick="scan()">Scan Server</button>
+</header>
+
+<div id="servers" class="grid"></div>
+
+<script>
+
+function pingColor(p){
+if(p<80) return "#00ff88"
+if(p<150) return "#ffaa00"
+return "#ff4444"
+}
+
+function playerColor(v){
+if(v<0.5) return "#00ff88"
+if(v<0.8) return "#ffaa00"
+return "#ff4444"
+}
+
+function fpsColor(f){
+if(f>50) return "#00ff88"
+if(f>30) return "#ffaa00"
+return "#ff4444"
+}
+
+function join(place,id){
+window.location=`roblox://placeId=${place}&gameInstanceId=${id}`
+}
+
+async function scan(){
+
+let place=document.getElementById("place").value.trim()
+if(!place) return
+
+localStorage.setItem("place",place)
+
+let cursor=null
+let servers=[]
+
+while(true){
+
+let url=`https://games.roblox.com/v1/games/${place}/servers/Public?limit=100`
+
+if(cursor) url+=`&cursor=${cursor}`
+
+let res=await fetch(url)
+let data=await res.json()
+
+servers=servers.concat(data.data)
+
+cursor=data.nextPageCursor
+
+if(!cursor) break
+}
+
+servers.sort((a,b)=>a.ping-b.ping)
+
+let container=document.getElementById("servers")
+container.innerHTML=""
+
+servers.forEach(s=>{
+
+let players=s.playing
+let max=s.maxPlayers
+let fps=s.fps||0
+let ping=s.ping
+
+let playerRatio=players/max
+
+let card=document.createElement("div")
+card.className="card"
+
+card.innerHTML=`
+
+<div class="title">${players}/${max} Players</div>
+
+<div>
+<span class="ping-dot" style="color:${pingColor(ping)}">●</span>
+Ping ${ping} ms
+</div>
+
+<div>Players</div>
+<div class="bar">
+<div class="chunk" style="width:${playerRatio*100}%;background:${playerColor(playerRatio)}"></div>
+</div>
+
+<div>FPS ${fps}</div>
+<div class="bar">
+<div class="chunk" style="width:${Math.min(fps,100)}%;background:${fpsColor(fps)}"></div>
+</div>
+
+<button onclick="join('${place}','${s.id}')">JOIN</button>
+`
+
+container.appendChild(card)
+
+})
+
+}
+
+document.getElementById("place").value=localStorage.getItem("place")||""
+
+</script>
+
+</body>
+</html>
