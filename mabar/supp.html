@@ -129,7 +129,7 @@
   <div class="wrapper">
     <div class="blade-box entry-anim" id="mainBox">
       <div class="inner-content" id="donationArea">
-        <span class="donator-label">NO TRIBUTES THIS MONTH</span>
+        <span class="donator-label">NO RECENT TRIBUTES</span>
         <div class="donator-name">NONE</div>
         <div class="donator-msg">"Awaiting the next blade..."</div>
       </div>
@@ -177,7 +177,7 @@
       const message = item.message ? `"${item.message}"` : `"Makasih..."`;
 
       donationArea.innerHTML = `
-        <span class="donator-label">SUPPORT BULAN INI</span>
+        <span class="donator-label">RECENT CONTRIBUTION</span>
         <div class="donator-name">${name}</div>
         ${message ? `<div class="donator-msg">${message}</div>` : ''}
       `;
