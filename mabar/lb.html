@@ -301,6 +301,17 @@ body {
   color: var(--orange);
 }
 
+/* ── empty placeholder rows ───────────────────── */
+
+.lb-row--empty {
+  opacity: 0.25;
+}
+
+.lb-row--empty .rank-name {
+  color: var(--muted) !important;
+  letter-spacing: 3px;
+}
+
 /* ── row entry animation ──────────────────────── */
 
 .lb-row {
@@ -410,27 +421,29 @@ function renderLeaderboard(data) {
     return;
   }
 
-  const max  = Math.min(data.length, 10);
-  let html   = "";
+  const MAX_SHOW = 10;
+  const MIN_ROWS = 7;
+  const filled   = Math.min(data.length, MAX_SHOW);
+  const total    = Math.max(filled, MIN_ROWS);
+  let html       = "";
 
-  for (let i = 0; i < max; i++) {
-    const d   = data[i];
-    const rank = i + 1;
-    const isFirst = rank === 1;
+  for (let i = 0; i < total; i++) {
+    const d     = data[i];
+    const rank  = i + 1;
+    const empty = !d;
 
     html += `
-      <div class="lb-row lb-row--${rank}">
-        ${isFirst ? `<span class="crown">👑</span>` : ""}
+      <div class="lb-row lb-row--${rank}${empty ? ' lb-row--empty' : ''}">
+        ${rank === 1 && !empty ? `<span class="crown">👑</span>` : ""}
         <div class="rank-badge">
           <span class="rank-num">${rank}</span>
         </div>
-        <div class="rank-name">${escHtml(d.donator)}</div>
-        <div class="rank-amount">${formatter.format(d.amount)}</div>
+        <div class="rank-name">${empty ? "—" : escHtml(d.donator)}</div>
+        <div class="rank-amount">${empty ? "" : formatter.format(d.amount)}</div>
       </div>
     `;
 
-    // subtle divider after rank 1
-    if (rank === 1 && max > 1) html += `<div class="lb-divider"></div>`;
+    if (rank === 1 && total > 1) html += `<div class="lb-divider"></div>`;
   }
 
   lbBody.innerHTML = html;
