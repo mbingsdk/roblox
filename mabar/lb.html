@@ -45,8 +45,8 @@ body{
 .blade-box{
   position:relative;
   background:var(--bg-black);
-  padding:16px 35px;
-  min-width:300px;
+  padding:18px 40px;
+  min-width:340px;
 
   transform:skewX(-20deg);
 
@@ -98,39 +98,53 @@ body{
   margin-bottom:10px;
 }
 
-/* leaderboard rows */
+/* leaderboard container */
+
+.leaderboard{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+/* row */
 
 .rank-row{
-  display:flex;
-  justify-content:space-between;
+  display:grid;
+  grid-template-columns:32px 1fr auto;
   align-items:center;
-  margin:4px 0;
+  gap:10px;
+
   font-size:0.9rem;
   color:var(--text-white);
 }
 
-.rank-pos{
-  color:var(--samurai-orange);
+/* rank number */
+
+.rank-number{
   font-weight:900;
-  margin-right:6px;
+  color:var(--samurai-orange);
+  text-align:left;
 }
 
+/* name */
+
 .rank-name{
-  flex:1;
   text-transform:uppercase;
 }
 
+/* amount */
+
 .rank-amount{
-  color:var(--samurai-orange);
   font-weight:700;
+  color:var(--samurai-orange);
 }
 
-/* champion effect */
+/* champion glow */
 
 .rank-row:first-child{
+  font-size:1.05rem;
   font-weight:900;
-  font-size:1rem;
-  text-shadow:0 0 10px var(--samurai-glow);
+  text-shadow:0 0 12px var(--samurai-glow);
 }
 
 /* empty message */
@@ -181,17 +195,17 @@ body{
 
 <script>
 
-const API_URL = "https://backend.saweria.co/widgets/leaderboard/month";
+const API_URL="https://backend.saweria.co/widgets/leaderboard/month";
 
-const urlParams = new URLSearchParams(window.location.search);
-const STREAM_KEY = urlParams.get("streamKey");
+const urlParams=new URLSearchParams(window.location.search);
+const STREAM_KEY=urlParams.get("streamKey");
 
-const leaderboardArea = document.getElementById("leaderboardArea");
-const mainBox = document.getElementById("mainBox");
+const leaderboardArea=document.getElementById("leaderboardArea");
+const mainBox=document.getElementById("mainBox");
 
-let donations = [];
+let donations=[];
 
-const currencyFormatter = new Intl.NumberFormat("id-ID",{
+const formatter=new Intl.NumberFormat("id-ID",{
   style:"currency",
   currency:"IDR",
   minimumFractionDigits:0
@@ -205,12 +219,12 @@ async function fetchLeaderboard(){
 
   try{
 
-    const res = await axios.get(API_URL,{
+    const res=await axios.get(API_URL,{
       headers:{ "Stream-Key": STREAM_KEY }
     });
 
     if(res.data?.data){
-      donations = res.data.data;
+      donations=res.data.data;
       renderLeaderboard();
     }
 
@@ -230,7 +244,7 @@ function renderLeaderboard(){
 
   if(!donations.length){
 
-    leaderboardArea.innerHTML = `
+    leaderboardArea.innerHTML=`
       <div class="board-title">MONTHLY TRIBUTES</div>
       <div class="empty-msg">No tributes this month</div>
     `;
@@ -238,29 +252,30 @@ function renderLeaderboard(){
     return;
   }
 
-  const maxShow = Math.min(donations.length,5);
+  const maxShow=Math.min(donations.length,5);
 
-  let html = `<div class="board-title">MONTHLY TRIBUTES</div>`;
+  let html=`
+  <div class="board-title">MONTHLY TRIBUTES</div>
+  <div class="leaderboard">
+  `;
 
   for(let i=0;i<maxShow;i++){
 
-    const item = donations[i];
+    const item=donations[i];
 
-    html += `
+    html+=`
       <div class="rank-row">
-        <div class="rank-name">
-          <span class="rank-pos">#${i+1}</span>
-          ${item.donator}
-        </div>
-        <div class="rank-amount">
-          ${currencyFormatter.format(item.amount)}
-        </div>
+        <div class="rank-number">${i+1}</div>
+        <div class="rank-name">${item.donator}</div>
+        <div class="rank-amount">${formatter.format(item.amount)}</div>
       </div>
     `;
 
   }
 
-  leaderboardArea.innerHTML = html;
+  html+=`</div>`;
+
+  leaderboardArea.innerHTML=html;
 
 }
 
@@ -274,8 +289,7 @@ if(STREAM_KEY){
 
 }else{
 
-  leaderboardArea.innerHTML =
-  "<div style='color:red'>MISSING STREAM KEY</div>";
+  leaderboardArea.innerHTML="<div style='color:red'>MISSING STREAM KEY</div>";
 
 }
 
