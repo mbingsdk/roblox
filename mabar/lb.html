@@ -3,298 +3,447 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Samurai Blade Monthly Leaderboard</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Lato:ital,wght@1,400&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
 <style>
 
-:root{
-  --samurai-orange:#FF8900;
-  --samurai-glow:rgba(255,137,0,0.5);
-  --bg-black:rgba(10,10,10,0.9);
-  --text-white:#ffffff;
+:root {
+  --orange:      #FF8C00;
+  --orange-dim:  #b56200;
+  --gold:        #FFD060;
+  --glow:        rgba(255,140,0,0.45);
+  --glow-soft:   rgba(255,140,0,0.15);
+  --bg:          rgba(8,6,4,0.92);
+  --bg-row:      rgba(255,140,0,0.05);
+  --bg-row-1:    rgba(255,208,96,0.10);
+  --line:        rgba(255,140,0,0.25);
+  --white:       #f5ede0;
+  --muted:       #9a8872;
 }
 
-body{
-  margin:0;
-  background:transparent;
-  font-family:'Cinzel',serif;
-  overflow:hidden;
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: transparent;
+  overflow: hidden;
+  font-family: 'Rajdhani', sans-serif;
 }
 
-/* wrapper */
+/* ── outer wrapper ─────────────────────────────── */
 
-.wrapper{
-  position:fixed;
-  top:30px;
-  right:30px;
-  display:flex;
-  flex-direction:column;
-  align-items:flex-end;
+.lb-wrap {
+  position: fixed;
+  top: 28px;
+  right: 28px;
+  width: 360px;
+  animation: fadeIn .8s ease forwards;
 }
 
-/* blade container */
-
-.blade-box{
-  position:relative;
-  background:var(--bg-black);
-  padding:18px 40px;
-  min-width:340px;
-
-  transform:skewX(-20deg);
-
-  border-right:8px solid var(--samurai-orange);
-  border-left:2px solid rgba(255,137,0,0.3);
-
-  box-shadow:-10px 0 20px rgba(0,0,0,0.5);
-  overflow:hidden;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-/* blade shine */
+/* ── card ─────────────────────────────────────── */
 
-.blade-box::after{
-  content:'';
-  position:absolute;
-  top:0;
-  left:-150%;
-  width:100%;
-  height:100%;
-
-  background:linear-gradient(
-    90deg,
-    transparent,
-    rgba(255,255,255,0.3),
-    transparent
-  );
-
-  animation:slash 5s infinite;
+.lb-card {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-top: 2px solid var(--orange);
+  position: relative;
+  overflow: hidden;
 }
 
-@keyframes slash{
-  0%,40%{left:-150%}
-  50%,100%{left:150%}
+/* top sword accent line */
+.lb-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--orange), var(--gold), transparent);
+  animation: shimmer 4s linear infinite;
+  background-size: 200% 100%;
 }
 
-/* inner area */
-
-.inner-content{
-  transform:skewX(20deg);
-  text-align:right;
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
 }
 
-/* title */
-
-.board-title{
-  font-size:0.75rem;
-  letter-spacing:4px;
-  color:var(--samurai-orange);
-  margin-bottom:10px;
+/* corner cuts — gives katana handle aesthetic */
+.lb-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; right: 0;
+  width: 0; height: 0;
+  border-style: solid;
+  border-width: 0 0 18px 18px;
+  border-color: transparent transparent var(--orange-dim) transparent;
 }
 
-/* leaderboard container */
+/* ── header ───────────────────────────────────── */
 
-.leaderboard{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
+.lb-header {
+  padding: 14px 20px 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--line);
 }
 
-/* row */
-
-.rank-row{
-  display:grid;
-  grid-template-columns:32px 1fr auto;
-  align-items:center;
-  gap:10px;
-
-  font-size:0.9rem;
-  color:var(--text-white);
+.lb-icon {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* rank number */
-
-.rank-number{
-  font-weight:900;
-  color:var(--samurai-orange);
-  text-align:left;
+/* SVG katana silhouette */
+.lb-icon svg {
+  width: 28px;
+  height: 28px;
+  filter: drop-shadow(0 0 6px var(--glow));
 }
 
-/* name */
-
-.rank-name{
-  text-transform:uppercase;
-  text-align:left;
+.lb-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
 }
 
-/* amount */
-
-.rank-amount{
-  font-weight:700;
-  color:var(--samurai-orange);
+.lb-label {
+  font-family: 'Cinzel', serif;
+  font-size: 0.56rem;
+  letter-spacing: 5px;
+  color: var(--muted);
+  text-transform: uppercase;
 }
 
-/* champion glow */
-
-.rank-row:first-child{
-  font-size:1.05rem;
-  font-weight:900;
-  text-shadow:0 0 12px var(--samurai-glow);
+.lb-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 0.9rem;
+  color: var(--gold);
+  letter-spacing: 1px;
+  line-height: 1;
+  text-shadow: 0 0 16px var(--glow);
 }
 
-/* empty message */
+/* ── body ─────────────────────────────────────── */
 
-.empty-msg{
-  font-family:'Lato',sans-serif;
-  font-size:0.85rem;
-  color:#bbb;
-  font-style:italic;
+.lb-body {
+  padding: 10px 0 8px;
 }
 
-/* entry animation */
+/* ── row ──────────────────────────────────────── */
 
-.entry-anim{
-  animation:entrySlash .6s cubic-bezier(.23,1,.32,1) forwards;
+.lb-row {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  padding: 7px 20px 7px 0;
+  gap: 0;
+  border-bottom: 1px solid rgba(255,140,0,0.06);
+  transition: background .2s;
+  position: relative;
 }
 
-@keyframes entrySlash{
-  0%{
-    opacity:0;
-    transform:translateX(50px) skewX(-20deg);
-  }
-  100%{
-    opacity:1;
-    transform:translateX(0) skewX(-20deg);
-  }
+.lb-row:last-child {
+  border-bottom: none;
+}
+
+/* rank 1 special highlight */
+.lb-row--1 {
+  background: var(--bg-row-1);
+}
+
+.lb-row--1 .rank-name {
+  color: var(--gold) !important;
+}
+
+/* ── rank badge ───────────────────────────────── */
+
+.rank-badge {
+  width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* vertical accent bar */
+.rank-badge::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 70%;
+  background: var(--orange);
+  opacity: 0;
+}
+
+.lb-row--1 .rank-badge::before {
+  opacity: 1;
+  background: linear-gradient(180deg, var(--gold), var(--orange));
+  box-shadow: 0 0 8px var(--glow);
+}
+
+.rank-num {
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted);
+  width: 22px;
+  text-align: center;
+}
+
+.lb-row--1 .rank-num { color: var(--gold); font-size: 0.88rem; }
+.lb-row--2 .rank-num { color: #c0c0c0; }
+.lb-row--3 .rank-num { color: #cd7f32; }
+
+/* ── name ─────────────────────────────────────── */
+
+.rank-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--white);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 10px;
+}
+
+/* ── amount ───────────────────────────────────── */
+
+.rank-amount {
+  font-family: 'Cinzel', serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--orange);
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.lb-row--1 .rank-amount {
+  color: var(--gold);
+  font-size: 0.88rem;
+  text-shadow: 0 0 10px var(--glow);
+}
+
+/* ── crown for rank 1 ─────────────────────────── */
+
+.crown {
+  font-size: 0.8rem;
+  position: absolute;
+  top: -1px;
+  left: 20px;
+  opacity: 0.85;
+  animation: crownPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes crownPulse {
+  0%, 100% { opacity: 0.7; transform: translateY(0); }
+  50%       { opacity: 1;   transform: translateY(-2px); }
+}
+
+/* ── divider ──────────────────────────────────── */
+
+.lb-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line), transparent);
+  margin: 2px 20px;
+}
+
+/* ── empty state ──────────────────────────────── */
+
+.lb-empty {
+  padding: 20px;
+  text-align: center;
+  font-family: 'Cinzel', serif;
+  font-size: 0.7rem;
+  letter-spacing: 3px;
+  color: var(--muted);
+}
+
+/* ── footer ───────────────────────────────────── */
+
+.lb-footer {
+  padding: 7px 20px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--line);
+}
+
+.lb-footer-text {
+  font-family: 'Cinzel', serif;
+  font-size: 0.5rem;
+  letter-spacing: 3px;
+  color: var(--muted);
+}
+
+.lb-month {
+  font-family: 'Cinzel', serif;
+  font-size: 0.55rem;
+  letter-spacing: 2px;
+  color: var(--orange);
+}
+
+/* ── row entry animation ──────────────────────── */
+
+.lb-row {
+  opacity: 0;
+  animation: rowIn .5s cubic-bezier(.16,1,.3,1) forwards;
+}
+
+.lb-row:nth-child(1) { animation-delay: .05s; }
+.lb-row:nth-child(2) { animation-delay: .12s; }
+.lb-row:nth-child(3) { animation-delay: .19s; }
+.lb-row:nth-child(4) { animation-delay: .26s; }
+.lb-row:nth-child(5) { animation-delay: .33s; }
+
+@keyframes rowIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* no key error */
+.lb-error {
+  padding: 16px 20px;
+  color: #e05050;
+  font-family: 'Cinzel', serif;
+  font-size: 0.65rem;
+  letter-spacing: 2px;
 }
 
 </style>
 </head>
-
 <body>
 
-<div class="wrapper">
+<div class="lb-wrap">
+  <div class="lb-card">
 
-  <div class="blade-box entry-anim" id="mainBox">
+    <!-- Header -->
+    <div class="lb-header">
+      <div class="lb-icon">
+        <!-- katana SVG -->
+        <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <line x1="2" y1="26" x2="22" y2="6" stroke="#FF8C00" stroke-width="1.8" stroke-linecap="round"/>
+          <line x1="22" y1="6" x2="26" y2="2" stroke="#FFD060" stroke-width="2.2" stroke-linecap="round"/>
+          <rect x="17" y="10" width="5" height="3" rx="0.5" transform="rotate(-45 17 10)" fill="#FF8C00" opacity="0.7"/>
+          <circle cx="5" cy="23" r="2.2" fill="#FF8C00" opacity="0.5"/>
+        </svg>
+      </div>
+      <div class="lb-titles">
+        <span class="lb-label">Saweria</span>
+        <span class="lb-title">Monthly Tributes</span>
+      </div>
+    </div>
 
-    <div class="inner-content" id="leaderboardArea">
+    <!-- Leaderboard body -->
+    <div class="lb-body" id="lbBody">
+      <div class="lb-empty">Awaiting the first warrior...</div>
+    </div>
 
-      <div class="board-title">MONTHLY TRIBUTES</div>
-      <div class="empty-msg">Awaiting the first warrior...</div>
-
+    <!-- Footer -->
+    <div class="lb-footer">
+      <span class="lb-footer-text">TOP DONATORS</span>
+      <span class="lb-month" id="lbMonth"></span>
     </div>
 
   </div>
-
 </div>
 
 <script>
 
-const API_URL="https://backend.saweria.co/widgets/leaderboard/month";
+const API_URL   = "https://backend.saweria.co/widgets/leaderboard/month";
+const params    = new URLSearchParams(window.location.search);
+const STREAM_KEY = params.get("streamKey");
+const lbBody    = document.getElementById("lbBody");
+const lbMonth   = document.getElementById("lbMonth");
 
-const urlParams=new URLSearchParams(window.location.search);
-const STREAM_KEY=urlParams.get("streamKey");
+// Show current month
+const MONTHS = ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
+const now = new Date();
+lbMonth.textContent = MONTHS[now.getMonth()] + " " + now.getFullYear();
 
-const leaderboardArea=document.getElementById("leaderboardArea");
-const mainBox=document.getElementById("mainBox");
-
-let donations=[];
-
-const formatter=new Intl.NumberFormat("id-ID",{
-  style:"currency",
-  currency:"IDR",
-  minimumFractionDigits:0
+const formatter = new Intl.NumberFormat("id-ID", {
+  style: "currency",
+  currency: "IDR",
+  minimumFractionDigits: 0
 });
 
-/* fetch leaderboard */
+const MEDAL = ["👑", "②", "③", "④", "⑤"];
 
-async function fetchLeaderboard(){
-
-  if(!STREAM_KEY) return;
-
-  try{
-
-    const res=await axios.get(API_URL,{
-      headers:{ "Stream-Key": STREAM_KEY }
+async function fetchLeaderboard() {
+  if (!STREAM_KEY) return;
+  try {
+    const res = await axios.get(API_URL, {
+      headers: { "Stream-Key": STREAM_KEY }
     });
-
-    if(res.data?.data){
-      donations=res.data.data;
-      renderLeaderboard();
-    }
-
-  }catch(err){
-    console.error(err);
+    if (res.data?.data) renderLeaderboard(res.data.data);
+  } catch(e) {
+    console.error(e);
   }
-
 }
 
-/* render leaderboard */
-
-function renderLeaderboard(){
-
-  mainBox.classList.remove("entry-anim");
-  void mainBox.offsetWidth;
-  mainBox.classList.add("entry-anim");
-
-  if(!donations.length){
-
-    leaderboardArea.innerHTML=`
-      <div class="board-title">MONTHLY TRIBUTES</div>
-      <div class="empty-msg">No tributes this month</div>
-    `;
-
+function renderLeaderboard(data) {
+  if (!data || !data.length) {
+    lbBody.innerHTML = `<div class="lb-empty">NO TRIBUTES THIS MONTH</div>`;
     return;
   }
 
-  const maxShow=Math.min(donations.length,5);
+  const max  = Math.min(data.length, 5);
+  let html   = "";
 
-  let html=`
-  <div class="board-title">MONTHLY TRIBUTES</div>
-  <div class="leaderboard">
-  `;
+  for (let i = 0; i < max; i++) {
+    const d   = data[i];
+    const rank = i + 1;
+    const isFirst = rank === 1;
 
-  for(let i=0;i<maxShow;i++){
-
-    const item=donations[i];
-
-    html+=`
-      <div class="rank-row">
-        <div class="rank-number">${i+1}</div>
-        <div class="rank-name">${item.donator}</div>
-        <div class="rank-amount">${formatter.format(item.amount)}</div>
+    html += `
+      <div class="lb-row lb-row--${rank}">
+        ${isFirst ? `<span class="crown">👑</span>` : ""}
+        <div class="rank-badge">
+          <span class="rank-num">${rank}</span>
+        </div>
+        <div class="rank-name">${escHtml(d.donator)}</div>
+        <div class="rank-amount">${formatter.format(d.amount)}</div>
       </div>
     `;
 
+    // subtle divider after rank 1
+    if (rank === 1 && max > 1) html += `<div class="lb-divider"></div>`;
   }
 
-  html+=`</div>`;
-
-  leaderboardArea.innerHTML=html;
-
+  lbBody.innerHTML = html;
 }
 
-/* init */
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;");
+}
 
-if(STREAM_KEY){
-
+if (STREAM_KEY) {
   fetchLeaderboard();
-
-  setInterval(fetchLeaderboard,60000);
-
-}else{
-
-  leaderboardArea.innerHTML="<div style='color:red'>MISSING STREAM KEY</div>";
-
+  setInterval(fetchLeaderboard, 60000);
+} else {
+  lbBody.innerHTML = `<div class="lb-error">MISSING STREAM KEY</div>`;
 }
 
 </script>
-
 </body>
 </html>
