@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Samurai Donation — Ink</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: transparent; overflow: hidden; }
+
+    /* ═══════════════════════════════
+       WRAPPER — bottom left
+    ═══════════════════════════════ */
+    .overlay {
+      position: fixed;
+      bottom: 32px;
+      left: 32px;
+      font-family: 'Barlow Condensed', sans-serif;
+    }
+
+    /* ═══════════════════════════════
+       SLIDE-IN ANIMATION
+    ═══════════════════════════════ */
+    .card-wrap {
+      transform: translateX(-110%);
+      opacity: 0;
+      transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+                  opacity 0.4s ease;
+    }
+    .card-wrap.visible {
+      transform: translateX(0);
+      opacity: 1;
+    }
+
+    /* ═══════════════════════════════
+       MAIN CARD — wide horizontal
+    ═══════════════════════════════ */
+    .card {
+      position: relative;
+      display: flex;
+      align-items: stretch;
+      background: rgba(0,0,0,0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      /* Top-right diagonal cut, bottom-right small cut */
+      clip-path: polygon(
+        0% 0%,
+        calc(100% - 20px) 0%,
+        100% 20px,
+        100% 100%,
+        0% 100%
+      );
+      width: 380px;
+      overflow: hidden;
+    }
+
+    /* inner border */
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      clip-path: polygon(
+        0% 0%,
+        calc(100% - 20px) 0%,
+        100% 20px,
+        100% 100%,
+        0% 100%
+      );
+      border: 1.5px solid rgba(255,255,255,0.18);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* corner fill */
+    .card::after {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      border-style: solid;
+      border-width: 0 22px 22px 0;
+      border-color: transparent rgba(255,255,255,0.15) transparent transparent;
+      z-index: 3;
+      pointer-events: none;
+    }
+
+    /* shimmer sweep */
+    .shimmer {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        105deg,
+        transparent 30%,
+        rgba(255,255,255,0.04) 50%,
+        transparent 70%
+      );
+      background-size: 250% 100%;
+      animation: sheen 7s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 1;
+    }
+    @keyframes sheen {
+      0%   { background-position: 200% 0; }
+      40%  { background-position: -100% 0; }
+      100% { background-position: -100% 0; }
+    }
+
+    /* ═══════════════════════════════
+       LEFT AMOUNT BLOCK
+    ═══════════════════════════════ */
+    .amount-block {
+      position: relative;
+      z-index: 4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 20px;
+      background: rgba(255,255,255,0.06);
+      border-right: 1px solid rgba(255,255,255,0.12);
+      min-width: 130px;
+      flex-shrink: 0;
+    }
+
+    .amount-currency {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 4px;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 0;
+      line-height: 1;
+    }
+
+    .amount-value {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.2rem;
+      color: #fff;
+      letter-spacing: 2px;
+      line-height: 1;
+      text-shadow: 0 0 30px rgba(255,255,255,0.2);
+    }
+
+    /* ═══════════════════════════════
+       RIGHT INFO BLOCK
+    ═══════════════════════════════ */
+    .info-block {
+      position: relative;
+      z-index: 4;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 12px 16px 10px 16px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .info-label {
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.38);
+      margin-bottom: 3px;
+    }
+
+    .donor-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      color: #fff;
+      letter-spacing: 2px;
+      line-height: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-shadow: 0 0 30px rgba(255,255,255,0.15);
+    }
+
+    /* ═══════════════════════════════
+       PAGE COUNTER — top-right inside info
+    ═══════════════════════════════ */
+    .page-counter {
+      position: absolute;
+      top: 8px;
+      right: 14px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.2);
+      z-index: 5;
+    }
+
+    /* ═══════════════════════════════
+       BOTTOM PROGRESS BAR
+    ═══════════════════════════════ */
+    .prog-bar {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: rgba(255,255,255,0.06);
+      z-index: 5;
+    }
+
+    .prog-fill {
+      height: 100%;
+      background: linear-gradient(to right, rgba(255,255,255,0.7), rgba(255,255,255,0.2));
+      transform-origin: left;
+    }
+    .prog-fill.run {
+      animation: shrink 8s linear forwards;
+    }
+    @keyframes shrink {
+      from { transform: scaleX(1); }
+      to   { transform: scaleX(0); }
+    }
+
+    /* ═══════════════════════════════
+       LIVE DOT — left edge
+    ═══════════════════════════════ */
+    .live-dot {
+      position: absolute;
+      left: -8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #fff;
+      z-index: 5;
+    }
+    .live-dot::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.35);
+      animation: ripple 2s ease-out infinite;
+    }
+    @keyframes ripple {
+      0%   { transform: scale(1); opacity: 0.5; }
+      100% { transform: scale(2.5); opacity: 0; }
+    }
+
+    /* ═══════════════════════════════
+       CONTENT FLIP ANIMATION
+    ═══════════════════════════════ */
+    .flip {
+      animation: flipUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    @keyframes flipUp {
+      0%   { opacity: 0; transform: translateY(8px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ═══════════════════════════════
+       TOP ACCENT LINE
+    ═══════════════════════════════ */
+    .accent-line {
+      position: absolute;
+      top: 0; left: 0;
+      width: 60px;
+      height: 2px;
+      background: #fff;
+      z-index: 5;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="overlay">
+    <div class="card-wrap" id="cardWrap">
+      <div class="card">
+        <div class="shimmer"></div>
+        <div class="accent-line"></div>
+        <div class="live-dot"></div>
+
+        <!-- LEFT: Amount -->
+        <div class="amount-block">
+          <span class="amount-currency">Rp</span>
+          <span class="amount-value" id="amountTxt">0</span>
+        </div>
+
+        <!-- RIGHT: Donor info -->
+        <div class="info-block">
+          <span class="page-counter" id="pageTxt">01/05</span>
+          <div class="info-label">Donasi Terbaru</div>
+          <div class="donor-name" id="donorName">—</div>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="prog-bar">
+          <div class="prog-fill" id="progFill"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const cardWrap  = document.getElementById("cardWrap");
+    const amountTxt = document.getElementById("amountTxt");
+    const donorName = document.getElementById("donorName");
+    const pageTxt   = document.getElementById("pageTxt");
+    const progFill  = document.getElementById("progFill");
+
+    const urlParams   = new URLSearchParams(window.location.search);
+    const TRIBE_ID    = urlParams.get('id') || '9764324770';
+    const API_URL     = `https://sociabuzz.com/pro/tribe/tribe_profile/detail_recent_running_int_v2/${TRIBE_ID}`;
+
+    // Parse entries from SociaBuzz HTML: "<strong> Nama (IDR10,000) </strong>"
+    function parseEntries(html) {
+      const matches = [...html.matchAll(/<strong>\s*(.+?)\s*\(IDR([\d,]+)\)\s*<\/strong>/g)];
+      return matches.map(m => ({
+        name:   m[1].trim(),
+        amount: parseInt(m[2].replace(/,/g, ''), 10)
+      }));
+    }
+
+    let entries      = [];
+    let currentIndex = 0;
+    let lastHtml     = '';
+
+    function resetProgress() {
+      progFill.classList.remove("run");
+      void progFill.offsetWidth;
+      progFill.classList.add("run");
+    }
+
+    function animateText(el) {
+      el.classList.remove("flip");
+      void el.offsetWidth;
+      el.classList.add("flip");
+    }
+
+    async function fetchData() {
+      try {
+        const res  = await axios.get(API_URL);
+        const html = res.data?.datas || '';
+        if (html && html !== lastHtml) {
+          lastHtml = html;
+          const parsed = parseEntries(html);
+          if (parsed.length) {
+            entries      = parsed;
+            currentIndex = 0;
+          }
+        }
+      } catch (err) { console.error(err); }
+    }
+
+    function renderDonation() {
+      if (!entries.length) return;
+
+      const maxShow = Math.min(entries.length, 5);
+      const item    = entries[currentIndex];
+      const rawAmt  = new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0 }).format(item.amount);
+
+      animateText(amountTxt);
+      animateText(donorName);
+
+      amountTxt.textContent = rawAmt;
+      donorName.textContent = item.name;
+      pageTxt.textContent   = String(currentIndex + 1).padStart(2,'0') + "/" + String(maxShow).padStart(2,'0');
+
+      resetProgress();
+      currentIndex = (currentIndex + 1) % maxShow;
+    }
+
+    // Boot
+    fetchData().then(() => {
+      setTimeout(() => cardWrap.classList.add("visible"), 300);
+      if (entries.length) setTimeout(renderDonation, 600);
+      setInterval(() => { if (entries.length) renderDonation(); }, 8000);
+      setInterval(fetchData, 30000);
+    });
+  </script>
+</body>
+</html>
